@@ -1,0 +1,943 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortify chargebacks</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="Logo 1.png" type="image/png">
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#094a78',    /* Dark Azure */
+                            grey: '#a7b0b6',    /* Grey Azure */
+                            light: '#f0f4f8',
+                            dark: '#063554',
+                            amex: '#006fcf',    /* Amex Blue */
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Custom Scrollbar for tables */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #a7b0b6;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #094a78;
+        }
+
+        /* Legal Page Typography */
+        .legal-content h1 { @apply text-3xl font-bold text-brand-blue mb-6; }
+        .legal-content h2 { @apply text-xl font-bold text-gray-800 mt-8 mb-4; }
+        .legal-content h3 { @apply text-lg font-semibold text-gray-700 mt-6 mb-2; }
+        .legal-content p { @apply text-gray-600 mb-4 leading-relaxed; }
+        .legal-content ul { @apply list-disc list-inside text-gray-600 mb-4 ml-4; }
+        .legal-content li { @apply mb-2; }
+    </style>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <!-- Logo Section -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="navigateTo('home')">
+                    <img class="h-28 w-30 mr-6" src="Logo 2.png" alt="Fortify Chargebacks Logo" onerror="this.style.display='none'; document.getElementById('text-logo').style.display='block';"> 
+                    
+                    <span id="text-logo" class="hidden font-bold text-2xl text-brand-blue tracking-tight">FORTIFY <span class="text-brand-grey">CHARGEBACKS</span></span>
+                    
+                    <!-- Text always visible for desktop -->
+                    <span class="hidden lg:block font-bold text-xl text-brand-blue ml-2 tracking-tight">FORTIFY CHARGEBACKS</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" onclick="navigateTo('home')" class="text-gray-600 hover:text-brand-blue font-medium transition">Home</a>
+                    <a href="#services" onclick="navigateTo('home', 'services')" class="text-gray-600 hover:text-brand-blue font-medium transition">Services</a>
+                    <a href="#timeframes" onclick="navigateTo('home', 'timeframes')" class="text-brand-blue font-semibold hover:text-brand-dark transition"><i class="fas fa-book-open mr-1"></i> Knowledge Base</a>
+                    <a href="#process" onclick="navigateTo('home', 'process')" class="text-gray-600 hover:text-brand-blue font-medium transition">Process</a>
+                    <a href="#contact" onclick="navigateTo('home', 'contact')" class="bg-brand-blue text-white px-5 py-2.5 rounded-full font-medium hover:bg-brand-dark transition shadow-lg transform hover:-translate-y-0.5">
+                        Get Started
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-blue focus:outline-none p-2">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg mt-20 z-40">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="#" onclick="navigateTo('home'); toggleMobileMenu()" class="block px-3 py-3 text-brand-blue font-medium border-b border-gray-100">Home</a>
+                <a href="#services" onclick="navigateTo('home', 'services'); toggleMobileMenu()" class="block px-3 py-3 text-gray-600 hover:text-brand-blue border-b border-gray-100">Services</a>
+                <a href="#timeframes" onclick="navigateTo('home', 'timeframes'); toggleMobileMenu()" class="block px-3 py-3 text-gray-600 hover:text-brand-blue border-b border-gray-100">Knowledge Base</a>
+                <a href="#process" onclick="navigateTo('home', 'process'); toggleMobileMenu()" class="block px-3 py-3 text-gray-600 hover:text-brand-blue border-b border-gray-100">Process</a>
+                <a href="#contact" onclick="navigateTo('home', 'contact'); toggleMobileMenu()" class="block mt-4 px-3 py-3 bg-brand-blue text-white text-center rounded-lg font-bold">Contact Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN APP CONTENT (Landing Page) -->
+    <div id="main-app">
+        <!-- Hero Section -->
+        <section id="home" class="relative pt-32 pb-20 lg:pt-44 lg:pb-32 bg-gradient-to-br from-brand-light via-white to-blue-50 overflow-hidden">
+            <!-- Background Decor -->
+            <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-brand-grey opacity-10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-brand-blue opacity-10 rounded-full blur-3xl"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center max-w-4xl mx-auto">
+                    <span class="text-brand-blue px-4 py-1.5 font-extrabold tracking-wide uppercase mb-6 inline">
+                        Recover Your Revenue
+                    </span>
+                    <h1 class="text-4xl lg:text-6xl font-extrabold text-blue-800 leading-tight mb-6">
+                        Professional Defense Against <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-800 to-blue-400">Chargebacks & Fraud</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
+                        Don't let disputes drain your profits. We provide expert chargeback defense and representation for merchants using Stripe, Shopify, and PayPal.
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                       
+                        </a>
+                        <a href="#contact" onclick="navigateTo('home', 'contact')" class="flex items-center justify-center bg-white text-brand-blue border-2 border-brand-blue px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-light transition shadow-md">
+                            Free Consultation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Supported Platforms Bar -->
+        <section class="py-10 bg-white border-y border-gray-100">
+            <div class="max-w-7xl mx-auto px-4">
+                <p class="text-center text-black-400 text-xs font-bold uppercase tracking-widest mb-10">Expertise Across Major Networks</p>
+                <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-100 ">
+                    <!-- Official Visa Logo -->
+                    <div class="flex items-center h-12">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-8 md:h-10 w-auto object-contain">
+                    </div>
+                    <!-- Official Mastercard Logo -->
+                    <div class="flex items-center h-12">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-8 md:h-10 w-auto object-contain">
+                    </div>
+                    <!-- Official American Express Logo -->
+                    <div class="flex items-center h-12">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="American Express" class="h-8 md:h-10 w-auto object-contain">
+                    </div>
+                    <!-- Official Stripe Logo -->
+                    <div class="flex items-center h-12">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" class="h-8 md:h-10 w-auto object-contain">
+                    </div>
+                    <!-- Official PayPal Logo -->
+                    <div class="flex items-center h-12">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="h-8 md:h-10 w-auto object-contain">
+                    </div>
+                    <!-- Official Shopify Logo -->
+                    <div class="flex items-center h-12">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Shopify_logo_2018.svg" alt="Shopify" class="h-8 md:h-10 w-auto object-contain">
+                    </div>
+                    <!-- Official Pulse Logo -->
+                    <div class="flex items-center h-12">
+                        <img src="Pulse.png" alt="Pulse" class="h-20 md:h-18 w-auto object-contain">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-brand-blue mb-5">Our Core Services</h2>
+                    <div class="w-24 h-1 bg-brand-blue mx-auto rounded-full"></div>
+                    <p class="mt-10 text-gray-800 max-w-2xl mx-auto">We specialize in comprehensive dispute management to protect your merchant account health.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Service 1 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 border-t-4 border-brand-blue group">
+                        <div class="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-brand-blue transition duration-300">
+                            <i class="fas fa-shield-alt text-2xl text-brand-blue group-hover:text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Chargeback Defense</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            We prepare evidence-based responses to win reversal disputes. Our team analyzes transaction data to build the strongest case for Visa, Mastercard, and bank disputes.
+                        </p>
+                    </div>
+
+                    <!-- Service 2 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 border-t-4 border-brand-blue group">
+                        <div class="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-brand-blue transition duration-300">
+                            <i class="fas fa-file-invoice-dollar text-2xl text-brand-blue group-hover:text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Commission Based</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            We believe in our results. Our pricing model is performance-based, meaning our fees are aligned with the money we recover for you. Low risk, high reward.
+                        </p>
+                    </div>
+
+                    <!-- Service 3 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 border-t-4 border-brand-blue group">
+                        <div class="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-brand-blue transition duration-300">
+                            <i class="fas fa-chart-line text-2xl text-brand-blue group-hover:text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Merchant Protection</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Protect your MID (Merchant ID) from high chargeback ratios. We help implement strategies to prevent disputes before they happen on Shopify and Stripe.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KNOWLEDGE BASE: CHARGEBACK TIMEFRAMES -->
+        <section id="timeframes" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-brand-blue font-bold tracking-wider uppercase text-sm">Merchant Awareness</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-4">Chargeback Timeframes & Codes</h2>
+                    <div class="w-24 h-1 bg-brand-blue mx-auto rounded-full"></div>
+                    <p class="mt-4 text-gray-600 max-w-3xl mx-auto">
+                        Understanding the filing deadlines and reason codes for each card association is critical for your defense. Missed deadlines mean lost revenue.
+                    </p>
+                </div>
+
+                <!-- Tab Navigation (Visual) -->
+                <div class="flex justify-center mb-8 flex-wrap gap-2 md:gap-4">
+                    <div class="flex flex-wrap justify-center bg-gray-100 p-1 rounded-lg">
+                        <!-- VISA Tab -->
+                        <button onclick="switchTab('visa')" id="tab-visa" class="px-4 md:px-6 py-2 rounded-md font-bold text-sm transition bg-white text-brand-blue shadow-sm flex items-center gap-2">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-3 md:h-4 w-auto object-contain">
+                            VISA
+                        </button>
+                        <!-- Mastercard Tab -->
+                        <button onclick="switchTab('mc')" id="tab-mc" class="px-4 md:px-6 py-2 rounded-md font-bold text-sm text-gray-500 hover:text-gray-700 transition flex items-center gap-2">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-5 md:h-8 w-auto object-contain">
+                            Mastercard
+                        </button>
+                        <!-- Amex Tab -->
+                        <button onclick="switchTab('amex')" id="tab-amex" class="px-4 md:px-6 py-2 rounded-md font-bold text-sm text-gray-500 hover:text-gray-700 transition flex items-center gap-2">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" class="h-5 md:h-6 w-auto object-contain">
+                            Amex
+                        </button>
+                        <!-- Pulse Tab -->
+                        <button onclick="switchTab('pulse')" id="tab-pulse" class="px-4 md:px-6 py-2 rounded-md font-bold text-sm text-gray-500 hover:text-gray-700 transition flex items-center gap-2">
+                            <img src="Pulse.png" alt="Pulse" class="h-5 md:h-8 w-auto object-contain">
+                            DISCOVER
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VISA Content -->
+                <div id="content-visa" class="animate-fade-in block">
+                    <div class="bg-blue-50 border border-blue rounded-xl overflow-hidden shadow-lg">
+                        <div class="bg-brand-blue px-6 py-4 flex items-center justify-between">
+                            <!-- Official Visa Logo in Header (Boxed for contrast) -->
+                            <h3 class="text-xl font-bold text-white flex items-center">
+                                <div class="bg-white px-2 py-1 rounded mr-3 h-10 flex items-center">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-6 w-auto">
+                                </div>
+                                Dispute Timeframes
+                            </h3>
+                            <span class="text-blue-50 text-sm font-medium">Standard Limit : 120 Days</span>
+                        </div>
+                        <div class="overflow-x-auto custom-scrollbar">
+                            <table class="w-full text-left text-sm text-black-800">
+                                <thead class="bg-blue-100 text-gray-700 uppercase font-bold">
+                                    <tr>
+                                        <th class="px-6 py-3">Reason Code</th>
+                                        <th class="px-6 py-3">Description</th>
+                                        <th class="px-6 py-3">Time Limit (Days)</th>
+                                        <th class="px-6 py-3">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-blue-100">
+                                    <tr class="hover:bg-blue-50/50">
+                                        <td class="px-6 py-4 font-bold text-brand-blue">10.4</td>
+                                        <td class="px-6 py-4">Other Fraud - Card-Absent Environment</td>
+                                        <td class="px-6 py-4"><span class="text-black-800 px-2 py-2 rounded text-xs font-bold">120 Days</span></td>
+                                        <td class="px-6 py-4">Counted from transaction date. Common for ecommerce.</td>
+                                    </tr>
+                                    <tr class="hover:bg-blue-50/50">
+                                        <td class="px-6 py-4 font-bold text-brand-blue">13.1</td>
+                                        <td class="px-6 py-4">Merchandise/Services Not Received</td>
+                                        <td class="px-6 py-4"><span class="text-black-800 px-2 py-1 rounded text-xs font-bold">120 Days</span></td>
+                                        <td class="px-6 py-4">Counted from the <em>expected</em> delivery date.</td>
+                                    </tr>
+                                    <tr class="hover:bg-blue-50/50">
+                                        <td class="px-6 py-4 font-bold text-brand-blue">13.3</td>
+                                        <td class="px-6 py-4">Not as Described or Defective</td>
+                                        <td class="px-6 py-4"><span class="text-black-800 px-2 py-1 rounded text-xs font-bold">120 Days</span></td>
+                                        <td class="px-6 py-4">Customer must attempt to return goods first.</td>
+                                    </tr>
+                                    <tr class="hover:bg-blue-50/50">
+                                        <td class="px-6 py-4 font-bold text-brand-blue">11.3</td>
+                                        <td class="px-6 py-4">No Authorization</td>
+                                        <td class="px-6 py-4"><span class="text-black-800 px-2 py-1 rounded text-xs font-bold">75 Days</span></td>
+                                        <td class="px-6 py-4">Shorter timeframe. Primarily for processing errors.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bg-blue-50 p-4 text-xs text-gray-500 italic border-t border-blue-100">
+                            * Timeframes are general guidelines. Specific issuer rules may vary. Always respond to us within 24-48 hours.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mastercard Content -->
+                <div id="content-mc" class="hidden animate-fade-in">
+                    <div class="bg-red-50 border border-red-100 rounded-xl overflow-hidden shadow-lg">
+                        <div class="bg-gray-900 px-6 py-4 flex items-center justify-between">
+                            <!-- Official Mastercard Logo in Header (Boxed for contrast) -->
+                            <h3 class="text-xl font-bold text-white flex items-center">
+                                <div class="bg-white px-2 py-1 rounded mr-3 h-10 flex items-center">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-6 w-auto">
+                                </div>
+                                Timeframes
+                            </h3>
+                            <span class="text-gray-50 text-sm font-medium">Standard Limit: 120 Days</span>
+                        </div>
+                        <div class="overflow-x-auto custom-scrollbar">
+                            <table class="w-full text-left text-sm text-gray-600">
+                                <thead class="bg-red-50 text-gray-700 uppercase font-bold">
+                                    <tr>
+                                        <th class="px-6 py-3">Reason Code</th>
+                                        <th class="px-6 py-3">Description</th>
+                                        <th class="px-6 py-3">Time Limit (Days)</th>
+                                        <th class="px-6 py-3">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-red-100">
+                                    <tr class="hover:bg-red-50/50">
+                                        <td class="px-6 py-4 font-bold text-red-700">4837</td>
+                                        <td class="px-6 py-4">No Cardholder Authorization (Fraud)</td>
+                                        <td class="px-6 py-4"><span class="text-red-800 px-2 py-1 rounded text-xs font-bold">120 Days</span></td>
+                                        <td class="px-6 py-4">From transaction settlement date.</td>
+                                    </tr>
+                                    <tr class="hover:bg-red-50/50">
+                                        <td class="px-6 py-4 font-bold text-red-700">4853</td>
+                                        <td class="px-6 py-4">Cardholder Dispute (Defective/Not Received)</td>
+                                        <td class="px-6 py-4"><span class=" text-red-800 px-2 py-1 rounded text-xs font-bold">120 Days</span></td>
+                                        <td class="px-6 py-4">From delivery date or date services were expected.</td>
+                                    </tr>
+                                    <tr class="hover:bg-red-50/50">
+                                        <td class="px-6 py-4 font-bold text-red-700">4808</td>
+                                        <td class="px-6 py-4">Authorization Related Chargeback</td>
+                                        <td class="px-6 py-4"><span class="text-red-800 px-2 py-1 rounded text-xs font-bold">90 Days</span></td>
+                                        <td class="px-6 py-4">Strict timeframe. Requires proof of valid authorization.</td>
+                                    </tr>
+                                    <tr class="hover:bg-red-50/50">
+                                        <td class="px-6 py-4 font-bold text-red-700">4834</td>
+                                        <td class="px-6 py-4">Point of Interaction Error</td>
+                                        <td class="px-6 py-4"><span class="text-red-800 px-2 py-1 rounded text-xs font-bold">120 Days</span></td>
+                                        <td class="px-6 py-4">Includes duplicate processing or late presentment.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AMEX Content (NEW) -->
+                <div id="content-amex" class="hidden animate-fade-in">
+                    <div class="bg-sky-50 border border-sky-100 rounded-xl overflow-hidden shadow-lg">
+                        <div class="bg-brand-amex px-6 py-4 flex items-center justify-between">
+                            <!-- Official Amex Logo in Header (Boxed) -->
+                            <h3 class="text-xl font-bold text-white flex items-center">
+                                <div class="bg-white px-2 py-1 rounded mr-3 h-10 flex items-center">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="American Express" class="h-16 w-auto">
+                                </div>
+                                Dispute Codes
+                            </h3>
+                            <span class="text-white text-sm font-medium">Inquiry Reply: 20 Days</span>
+                        </div>
+                        <div class="overflow-x-auto custom-scrollbar">
+                            <table class="w-full text-left text-sm text-gray-600">
+                                <thead class="bg-sky-100 text-gray-700 uppercase font-bold">
+                                    <tr>
+                                        <th class="px-6 py-3">Reason Code</th>
+                                        <th class="px-6 py-3">Description</th>
+                                        <th class="px-6 py-3">Reply Limit</th>
+                                        <th class="px-6 py-3">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-sky-100">
+                                    <tr class="hover:bg-sky-50/50">
+                                        <td class="px-6 py-4 font-bold text-brand-amex">F29</td>
+                                        <td class="px-6 py-4">Fraud - Card Not Present</td>
+                                        <td class="px-6 py-4"><span class="text-blue-800 px-2 py-1 rounded text-xs font-bold">20 Days</span></td>
+                                        <td class="px-6 py-4">Immediate reply required. Verify AVS/CVV matches.</td>
+                                    </tr>
+                                    <tr class="hover:bg-sky-50/50">
+                                        <td class="px-6 py-4 font-bold text-brand-amex">C08</td>
+                                        <td class="px-6 py-4">Goods/Services Not Received</td>
+                                        <td class="px-6 py-4"><span class=" text-blue-800 px-2 py-1 rounded text-xs font-bold">20 Days</span></td>
+                                        <td class="px-6 py-4">Provide tracking proof showing delivery to AVS address.</td>
+                                    </tr>
+                                    <tr class="hover:bg-sky-50/50">
+                                        <td class="px-6 py-4 font-bold text-brand-amex">C31</td>
+                                        <td class="px-6 py-4">Goods/Services Not As Described</td>
+                                        <td class="px-6 py-4"><span class=" text-blue-800 px-2 py-1 rounded text-xs font-bold">20 Days</span></td>
+                                        <td class="px-6 py-4">Written opinion from a qualified expert often helps.</td>
+                                    </tr>
+                                    <tr class="hover:bg-sky-50/50">
+                                        <td class="px-6 py-4 font-bold text-brand-amex">M01</td>
+                                        <td class="px-6 py-4">No Authorization</td>
+                                        <td class="px-6 py-4"><span class="text-blue-800 px-2 py-1 rounded text-xs font-bold">20 Days</span></td>
+                                        <td class="px-6 py-4">Charge was processed without valid approval code.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bg-sky-50 p-4 text-xs text-gray-500 italic border-t border-sky-100">
+                            * Amex typically requires a response to an inquiry within 20 days to avoid an immediate chargeback.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PULSE Content -->
+                <div id="content-pulse" class="hidden animate-fade-in">
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden shadow-lg">
+                        <div class="bg-gray-600 px-6 py-4 flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-white flex items-center">
+                                <div class="bg-white px-2 py-1 rounded mr-3 h-10 flex items-center">
+                                    <img src="Pulse.png" alt="Pulse" class="h-10 w-auto">
+                                </div>
+                                PULSE / Discover
+                            </h3>
+                            <span class="text-gray-200 text-sm font-medium">Varies by Reg E</span>
+                        </div>
+                        <div class="p-8">
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-lg mb-4">Regulation E Guidelines</h4>
+                                    <p class="text-gray-600 mb-4">
+                                        PULSE disputes often fall under US Regulation E (Electronic Fund Transfer Act).
+                                    </p>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-start">
+                                            <i class="fas fa-clock text-brand-blue mt-1 mr-2"></i>
+                                            <span class="text-gray-700 text-sm">Consumers generally have <strong>60 days</strong> from the date of the periodic statement containing the error to dispute it.</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-exclamation-circle text-brand-blue mt-1 mr-2"></i>
+                                            <span class="text-gray-700 text-sm">Merchants should retain documentation for at least <strong>2 years</strong>.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                                    <h4 class="font-bold text-gray-800 text-lg mb-2">Common PULSE Codes</h4>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between border-b border-gray-100 pb-2">
+                                            <span class="font-bold text-gray-700">UA01</span>
+                                            <span class="text-gray-500 text-sm">Fraud / Not Authorized</span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-gray-100 pb-2">
+                                            <span class="font-bold text-gray-700">IN01</span>
+                                            <span class="text-gray-500 text-sm">Item Not Received</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="font-bold text-gray-700">DP01</span>
+                                            <span class="text-gray-500 text-sm">Duplicate Processing</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- About / Why Us -->
+        <section id="process" class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col lg:flex-row items-center gap-12">
+                    <div class="lg:w-1/2">
+                        <div class="relative group">
+                            <div class="absolute inset-0 bg-brand-blue transform rotate-3 rounded-2xl opacity-10 group-hover:rotate-6 transition duration-500"></div>
+                            <img src="Webpage.png" alt="Business Meeting" class="relative rounded-2xl shadow-lg w-full">
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Dedicated To Defending Your Business</h2>
+                        <p class="text-lg text-gray-600 mb-6">
+                            Chargebacks can freeze your funds and shut down your payment processing. At <span class="text-brand-blue font-bold">Fortify Chargebacks</span>, we take the burden off your shoulders.
+                        </p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3 text-xl"></i>
+                                <span class="text-gray-700"><strong>Specialized Knowledge:</strong> Familiar with Visa, Mastercard, Pulse, and Star network rules.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3 text-xl"></i>
+                                <span class="text-gray-700"><strong>Platform Expertise:</strong> Deep understanding of Shopify, Stripe, and PayPal dispute centers.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3 text-xl"></i>
+                                <span class="text-gray-700"><strong>Personalized Support:</strong> You aren't just a number. We analyze every single case personally.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT FORM SECTION (BACKEND CONNECTED) -->
+        <section id="contact" class="py-20 bg-brand-blue relative overflow-hidden">
+            <!-- Decor -->
+            <div class="absolute top-0 left-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -ml-20 -mt-20"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-blue-400 opacity-10 rounded-full blur-3xl -mr-20 -mb-20"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="flex flex-col lg:flex-row gap-12">
+                    <!-- Contact Info Side -->
+                    <div class="lg:w-1/3 text-white">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-6">Let's Recover Your Revenue</h2>
+                        <p class="text-blue-100 text-lg mb-10 leading-relaxed">
+                            Fill out the form to get a free analysis of your recent chargebacks. We protect your data and never share it.
+                        </p>
+                        
+                        <div class="space-y-6">
+                            
+                           
+                            <div class="flex items-center p-4 bg-white/10 rounded-xl backdrop-blur-sm">
+                                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                                    <i class="fas fa-envelope text-2xl text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">Email Support</h3>
+                                    <p class="text-blue-200">support@fortifychargebacks.com</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FORM Side -->
+                    <div class="lg:w-2/3">
+                        <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-10">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-6">Send us a message</h3>
+                            
+                            <!-- The Form -->
+                            <form id="contactForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                        <input type="text" id="name" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="John Doe">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Business Email</label>
+                                        <input type="email" id="email" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="john@company.com">
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone (Optional)</label>
+                                        <input type="tel" id="phone" class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="+1 (555) 000-0000">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Monthly Volume</label>
+                                        <select id="volume" class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 outline-none transition text-gray-600">
+                                            <option value="Under $10k">Under $10k</option>
+                                            <option value="$10k - $50k">$10k - $50k</option>
+                                            <option value="$50k - $200k">$50k - $200k</option>
+                                            <option value="$200k+">$200k+</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Details about disputes</label>
+                                    <textarea id="message" rows="4" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="I have 5 chargebacks from Stripe regarding..."></textarea>
+                                </div>
+
+                                <button type="submit" id="submitBtn" class="w-full bg-brand-blue text-white font-bold py-4 rounded-lg hover:bg-brand-dark transition shadow-lg flex justify-center items-center">
+                                    <span>Send Message</span>
+                                    <i class="fas fa-paper-plane ml-2"></i>
+                                </button>
+                                
+                                <!-- Status Messages -->
+                                <div id="formStatus" class="hidden rounded-lg p-4 text-center text-sm font-medium"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- END MAIN APP CONTENT -->
+
+    <!-- ================= LEGAL PAGES (Hidden by Default) ================= -->
+
+    <!-- Privacy Policy Page -->
+    <section id="privacy-policy-page" class="hidden pt-32 pb-20 max-w-4xl mx-auto px-6 legal-content flex-grow animate-fade-in">
+        <h1 class="border-b-2 border-brand-light pb-4">🔐 Privacy Policy</h1>
+        <p class="text-sm text-gray-500 italic mb-8">Last updated: January 3, 2026</p>
+
+        <h3>Introduction</h3>
+        <p>Fortify Chargebacks (“we”, “our”, or “us”) respects your privacy and is committed to protecting the limited personal information you share with us. This Privacy Policy explains how information is collected and used when you visit fortifychargebacks.com.</p>
+        <p>By using this website, you agree to this Privacy Policy.</p>
+
+        <h2>1. Information We Collect</h2>
+        <h3>1.1 Information You Provide</h3>
+        <p>We collect personal information only when you voluntarily submit it through our contact form, which may include:</p>
+        <ul>
+            <li>Name</li>
+            <li>Email address</li>
+            <li>Message content</li>
+        </ul>
+        <p>We do not collect payment information, financial data, or sensitive personal data through this website.</p>
+
+        <h3>1.2 Automatically Collected Information</h3>
+        <p>Currently, we do not use cookies, analytics tools, or tracking technologies.</p>
+
+        <h2>2. Use of Information</h2>
+        <p>We use the information you provide solely to:</p>
+        <ul>
+            <li>Respond to inquiries</li>
+            <li>Communicate regarding our services upon request</li>
+        </ul>
+        <p>We do not use your information for marketing purposes without consent.</p>
+
+        <h2>3. Information Sharing</h2>
+        <p>We do not sell, rent, or trade personal information. Information may be disclosed only if required by law or to protect our legal rights.</p>
+
+        <h2>4. Data Security</h2>
+        <p>We take reasonable steps to safeguard submitted information. However, no online transmission or storage system is completely secure.</p>
+
+        <h2>5. International Visitors</h2>
+        <p>This website is accessible globally. By contacting us, you acknowledge that your information may be processed in jurisdictions with different data protection laws.</p>
+
+        <h2>6. Policy Updates</h2>
+        <p>We may update this Privacy Policy as our website or services evolve. Updates will be posted on this page.</p>
+
+        <h2>7. Contact</h2>
+        <p>For privacy-related questions:<br>
+        📧 <a href="mailto:support@fortifychargebacks.com" class="text-brand-blue font-semibold hover:underline">support@fortifychargebacks.com</a></p>
+    </section>
+
+    <!-- Disclaimer Page -->
+    <section id="disclaimer-page" class="hidden pt-32 pb-20 max-w-4xl mx-auto px-6 legal-content flex-grow animate-fade-in">
+        <h1 class="border-b-2 border-brand-light pb-4">⚠️ Disclaimer</h1>
+        <p class="text-sm text-gray-500 italic mb-8">Last updated: January 3, 2026</p>
+        <p>The information provided on fortifychargebacks.com is for general informational purposes only.</p>
+
+        <h2>1. No Legal or Financial Advice</h2>
+        <p>Fortify Chargebacks does not provide legal, financial, or regulatory advice. Any information shared on this website or through communication is based on general industry experience and should not be considered professional advice.</p>
+
+        <h2>2. No Guaranteed Results</h2>
+        <p>Chargeback and dispute outcomes depend on multiple external factors, including card network rules and issuing bank decisions.</p>
+        <p>We do not guarantee any specific outcome, reversal, or recovery.</p>
+
+        <h2>3. No Client Relationship</h2>
+        <p>Use of this website or submission of the contact form does not create a client, contractual, or advisory relationship.</p>
+
+        <h2>4. External Links</h2>
+        <p>This website may contain links to third-party websites. We are not responsible for their content or privacy practices.</p>
+
+        <h2>5. Use at Your Own Risk</h2>
+        <p>Any reliance on information provided on this website is at your own discretion and risk.</p>
+    </section>
+
+    <!-- Terms & Conditions Page -->
+    <section id="terms-page" class="hidden pt-32 pb-20 max-w-4xl mx-auto px-6 legal-content flex-grow animate-fade-in">
+        <h1 class="border-b-2 border-brand-light pb-4">📜 Terms & Conditions</h1>
+        <p class="text-sm text-gray-500 italic mb-8">Last updated: January 3, 2026</p>
+        <p>By accessing and using fortifychargebacks.com, you agree to the following Terms & Conditions.</p>
+
+        <h2>1. Website Purpose</h2>
+        <p>This website provides general information about chargeback management and dispute support services.</p>
+
+        <h2>2. Acceptable Use</h2>
+        <p>You agree not to:</p>
+        <ul>
+            <li>Use the website for unlawful purposes</li>
+            <li>Attempt to interfere with website security or functionality</li>
+            <li>Misuse or copy website content without permission</li>
+        </ul>
+
+        <h2>3. Intellectual Property</h2>
+        <p>All website content, including text, branding, and design, is the property of Fortify Chargebacks, unless otherwise stated. Unauthorized use is prohibited.</p>
+
+        <h2>4. Service Engagement</h2>
+        <p>Submitting a contact form does not constitute acceptance of services. Services are provided only after mutual agreement on scope, pricing, and terms.</p>
+
+        <h2>5. Limitation of Liability</h2>
+        <p>Fortify Chargebacks shall not be liable for:</p>
+        <ul>
+            <li>Any loss resulting from reliance on website content</li>
+            <li>Business decisions or chargeback outcomes</li>
+            <li>Temporary unavailability of the website</li>
+        </ul>
+
+        <h2>6. Changes to Terms</h2>
+        <p>We reserve the right to update these Terms & Conditions at any time. Continued use of the website indicates acceptance of updated terms.</p>
+
+        <h2>7. Governing Law</h2>
+        <p>These Terms shall be governed by applicable laws without regard to conflict-of-law principles.</p>
+
+        <h2>8. Contact</h2>
+        <p>For questions regarding these Terms:<br>
+        📧 <a href="mailto:support@fortifychargebacks.com" class="text-brand-blue font-semibold hover:underline">support@fortifychargebacks.com</a></p>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 border-t border-gray-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Brand -->
+                <div>
+                    <!-- UPDATED BRAND SECTION IN FOOTER -->
+                    <div class="flex items-center mb-4">
+                        <div class=" p-1 rounded-lg mr-3">
+                            <img src="Logo 1.png" alt="Fortify Chargebacks" class="h-30 w-auto">
+                        </div>
+                        <h3 class="text-2xl font-bold text-brand-grey">FORTIFY CHARGEBACKS</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                        Helping businesses protect their hard-earned revenue through expert dispute resolution and fraud prevention strategies.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-linkedin text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="https://instagram.com/fortify_chargebacks" target="_blank" class="text-gray-400 hover:text-pink-500 transition"><i class="fab fa-instagram text-xl"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 text-brand-grey">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" onclick="navigateTo('home')" class="hover:text-white transition">Home</a></li>
+                        <li><a href="#services" onclick="navigateTo('home', 'services')" class="hover:text-white transition">Services</a></li>
+                        <li><a href="#timeframes" onclick="navigateTo('home', 'timeframes')" class="hover:text-white transition">Knowledge Base</a></li>
+                        <li><a href="#contact" onclick="navigateTo('home', 'contact')" class="hover:text-white transition">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info Footer -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 text-brand-grey">Contact</h4>
+                    <ul class="space-y-3 text-gray-400 text-sm">
+                        <li class="flex items-center"><i class="fas fa-globe w-6 text-brand-blue"></i> fortifychargebacks.com</li>
+                        <li class="flex items-center"><i class="fas fa-envelope w-6 text-brand-blue"></i> support@fortifychargebacks.com</li>
+                    
+                        <li class="flex items-center"><i class="fab fa-instagram w-6 text-pink-500 font-bold text-lg"></i> @fortify_chargebacks</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+                <p>&copy; 2026 Fortify Chargebacks. All rights reserved.</p>
+                <div class="mt-4 md:mt-0 space-x-4">
+                    <a href="#" onclick="navigateTo('privacy')" class="hover:text-white transition">Privacy Policy</a>
+                    <a href="#" onclick="navigateTo('disclaimer')" class="hover:text-white transition">Disclaimer</a>
+                    <a href="#" onclick="navigateTo('terms')" class="hover:text-white transition">Terms & Conditions</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = __app_id;
+
+        // Sign in anonymously to allow writing to database
+        signInAnonymously(auth).then(() => {
+            console.log("Connected to backend");
+        }).catch((error) => {
+            console.error("Backend connection error", error);
+        });
+
+        // Make functions available globally
+        window.handleFormSubmit = async function(event) {
+            event.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const statusDiv = document.getElementById('formStatus');
+            const originalBtnContent = btn.innerHTML;
+
+            // Gather data
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const volume = document.getElementById('volume').value;
+            const message = document.getElementById('message').value;
+
+            // UI Loading State
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sending...';
+            statusDiv.classList.add('hidden');
+            statusDiv.className = 'hidden rounded-lg p-4 text-center text-sm font-medium';
+
+            try {
+                // 1. Save to Database (The "Backend" part)
+                if (auth.currentUser) {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'inquiries'), {
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        volume: volume,
+                        message: message,
+                        timestamp: serverTimestamp(),
+                        userId: auth.currentUser.uid
+                    });
+                } else {
+                    console.warn("User not authenticated, skipping DB save");
+                }
+
+                // 2. Success UI
+                statusDiv.innerText = "Message saved securely! We will contact you shortly.";
+                statusDiv.classList.remove('hidden');
+                statusDiv.classList.add('bg-green-100', 'text-green-800');
+                
+                // 3. Fallback: Open Mail Client
+                const subject = `Inquiry from ${name} - Fortify Chargebacks`;
+                const body = `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nVolume: ${volume}\n\nMessage:\n${message}`;
+
+                // Reset form
+                document.getElementById('contactForm').reset();
+
+            } catch (e) {
+                console.error("Error submitting form: ", e);
+                statusDiv.innerText = "Connection error. Please try WhatsApp or click the email link below.";
+                statusDiv.classList.remove('hidden');
+                statusDiv.classList.add('bg-red-100', 'text-red-800');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnContent;
+                
+                setTimeout(() => {
+                   if(statusDiv.classList.contains('bg-green-100')) {
+                       statusDiv.classList.add('hidden');
+                   }
+                }, 5000);
+            }
+        };
+    </script>
+
+    <!-- UI Logic Scripts -->
+    <script>
+        // === Page Navigation Logic ===
+        function navigateTo(page, sectionId = null) {
+            // 1. Hide Everything
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('privacy-policy-page').classList.add('hidden');
+            document.getElementById('disclaimer-page').classList.add('hidden');
+            document.getElementById('terms-page').classList.add('hidden');
+
+            // 2. Show Selected
+            if (page === 'home') {
+                document.getElementById('main-app').classList.remove('hidden');
+                // Scroll to section if specified
+                if (sectionId) {
+                    setTimeout(() => {
+                        const el = document.getElementById(sectionId);
+                        if(el) el.scrollIntoView({behavior: 'smooth'});
+                    }, 50);
+                } else {
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                }
+            } else if (page === 'privacy') {
+                document.getElementById('privacy-policy-page').classList.remove('hidden');
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            } else if (page === 'disclaimer') {
+                document.getElementById('disclaimer-page').classList.remove('hidden');
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            } else if (page === 'terms') {
+                document.getElementById('terms-page').classList.remove('hidden');
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+        }
+
+        // Tab Logic for Knowledge Base
+        function switchTab(tab) {
+            document.getElementById('content-visa').classList.add('hidden');
+            document.getElementById('content-mc').classList.add('hidden');
+            document.getElementById('content-pulse').classList.add('hidden');
+            document.getElementById('content-amex').classList.add('hidden');
+
+            const buttons = ['tab-visa', 'tab-mc', 'tab-pulse', 'tab-amex'];
+            buttons.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.classList.remove('bg-white', 'text-brand-blue', 'shadow-sm');
+                btn.classList.add('text-gray-500');
+            });
+
+            document.getElementById('content-' + tab).classList.remove('hidden');
+            
+            const activeBtn = document.getElementById('tab-' + tab);
+            activeBtn.classList.remove('text-gray-500');
+            activeBtn.classList.add('bg-white', 'text-brand-blue', 'shadow-sm');
+        }
+
+        // Mobile Menu Logic
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        function toggleMobileMenu() {
+            menu.classList.toggle('hidden');
+        }
+
+        btn.addEventListener('click', toggleMobileMenu);
+    </script>
+</body>
+</html>
