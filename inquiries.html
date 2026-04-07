@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Enquiries - Fortify Chargebacks</title>
+    <link rel="icon" href="../public/images/Logo%201.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        surface: { DEFAULT: '#0f1115', raised: '#161922', overlay: '#1c2030', border: '#262b3a' },
+                        accent: { DEFAULT: '#2563eb', light: '#3b82f6', muted: '#1e3a5f' },
+                        text: { primary: '#e8eaed', secondary: '#9ca3af', muted: '#6b7280' }
+                    },
+                    fontFamily: { sans: ['Poppins', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #0f1115;
+            color: #e8eaed;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #262b3a;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #262b3a;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        .nav-blur {
+            background: rgba(15, 17, 21, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased h-screen overflow-hidden" style="background-color:#0f1115; color:#e8eaed;">
+
+    <!-- ========================================================================= -->
+    <!-- FULL SCREEN LOADING (Security mechanism to hide UI during auth check)     -->
+    <!-- ========================================================================= -->
+    <div id="loading-screen" class="fixed inset-0 z-50 bg-surface-raised flex flex-col items-center justify-center">
+        <i class="fas fa-shield-alt text-5xl text-accent mb-4 animate-pulse"></i>
+        <h2 class="text-xl font-bold text-accent-light mb-2">Verifying Credentials</h2>
+        <p class="text-text-muted text-sm flex items-center">
+            <i class="fas fa-circle-notch fa-spin mr-2"></i> Connecting to secure server...
+        </p>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- DASHBOARD UI (Hidden until verified)                                      -->
+    <!-- ========================================================================= -->
+    <div id="dashboard-ui" class="hidden h-full flex w-full">
+
+        <!-- ===== SIDEBAR (Identical to dashboard, "Contact Inquiries" active) ===== -->
+        <aside class="w-64 bg-surface-raised text-white flex flex-col transition-all duration-300 z-20 hidden md:flex">
+            <!-- Sidebar Logo -->
+            <div class="h-20 flex items-center justify-center border-b border-surface-border px-4">
+                <img class="h-10 w-auto mr-3" src="../public/images/Logo%202.png" alt="Logo"
+                    onerror="this.style.display='none'">
+                <span class="font-bold text-lg tracking-tight text-text-primary">FORTIFY</span>
+            </div>
+
+            <!-- Sidebar Navigation -->
+            <nav class="flex-1 overflow-y-auto custom-scrollbar py-6 space-y-2 px-3">
+                <a href="dashboard.html"
+                    class="flex items-center px-4 py-3 text-text-secondary hover:bg-accent/50 hover:text-white rounded-lg transition">
+                    <i class="fas fa-chart-pie w-6"></i>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                <a href="clients.html"
+                    class="flex items-center px-4 py-3 text-text-secondary hover:bg-accent/50 hover:text-white rounded-lg transition">
+                    <i class="fas fa-users w-6"></i>
+                    <span class="font-medium">Client Accounts</span>
+                </a>
+                <a href="cases.html"
+                    class="flex items-center px-4 py-3 text-text-secondary hover:bg-accent/50 hover:text-white rounded-lg transition">
+                    <i class="fas fa-file-invoice-dollar w-6"></i>
+                    <span class="font-medium">Submitted Cases</span>
+                </a>
+                <a href="inquiries.html" class="flex items-center px-4 py-3 bg-accent text-white rounded-lg transition">
+                    <i class="fas fa-envelope w-6"></i>
+                    <span class="font-medium">Contact Inquiries</span>
+                </a>
+            </nav>
+
+            <!-- Sidebar Footer (Logout) -->
+            <div class="p-4 border-t border-surface-border">
+                <button onclick="handleLogout()"
+                    class="w-full flex items-center px-4 py-2 text-text-secondary hover:text-red-400 hover:bg-red-400/10 rounded-lg transition">
+                    <i class="fas fa-sign-out-alt w-6"></i>
+                    <span class="font-medium">Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT AREA ===== -->
+        <main class="flex-1 flex flex-col h-full bg-surface-overlay overflow-hidden relative">
+
+            <!-- TOP NAVBAR (Identical to dashboard) -->
+            <header
+                class="h-20 bg-surface-raised flex items-center justify-between px-6 lg:px-10 z-10 border-b border-surface-border">
+                <div class="flex items-center">
+                    <button id="mobile-menu-btn" class="md:hidden text-text-muted hover:text-accent mr-4">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-xl font-bold text-text-primary">Contact Enquiries</h1>
+                        <p class="text-xs text-text-muted leading-tight">Review and manage website enquiries</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div class="hidden sm:flex items-center">
+                        <span
+                            class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-bold border border-accent/20 flex items-center">
+                            <i class="fas fa-shield-alt mr-1.5"></i> Admin
+                        </span>
+                    </div>
+
+                    <div class="h-8 w-px bg-gray-200 mx-2 hidden sm:block"></div>
+
+                    <div class="flex items-center space-x-3 cursor-pointer">
+                        <div
+                            class="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center border border-surface-border text-accent font-bold">
+                            A
+                        </div>
+                        <div class="hidden md:block text-sm">
+                            <p class="font-bold text-text-primary leading-tight" id="admin-email-display">Loading...</p>
+                            <p class="text-xs text-text-muted">System Administrator</p>
+                        </div>
+                    </div>
+
+                    <button onclick="handleLogout()" class="md:hidden text-text-muted hover:text-red-400 ml-2">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ===== SCROLLABLE CONTENT ===== -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10">
+
+                <!-- Stats Summary Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+                    <!-- Total Enquiries -->
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-accent/10 flex items-center justify-center text-accent mr-4">
+                            <i class="fas fa-envelope-open-text text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">Total Enquiries</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-total">0</p>
+                        </div>
+                    </div>
+
+                    <!-- New (Unread) -->
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-red-900/20 flex items-center justify-center text-red-600 mr-4">
+                            <i class="fas fa-exclamation-circle text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">New</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-new">0</p>
+                        </div>
+                    </div>
+
+                    <!-- Closed -->
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-green-900/20 flex items-center justify-center text-green-400 mr-4">
+                            <i class="fas fa-check-circle text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">Closed</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-closed">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enquiries Table -->
+                <div class="bg-surface-raised rounded-2xl border border-surface-border overflow-hidden">
+                    <div
+                        class="px-6 py-5 border-b border-surface-border flex flex-col sm:flex-row sm:justify-between sm:items-center  gap-3">
+                        <h2 class="text-lg font-bold text-text-primary">All Enquiries</h2>
+                        <!-- Filter Tabs -->
+                        <div class="flex items-center space-x-2">
+                            <button data-filter="all"
+                                class="filter-btn active-filter px-3 py-1.5 rounded-lg text-xs font-bold transition border">All</button>
+                            <button data-filter="New"
+                                class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold transition border text-text-muted border-surface-border bg-surface-raised hover:bg-surface-overlay">New</button>
+                            <button data-filter="Replied"
+                                class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold transition border text-text-muted border-surface-border bg-surface-raised hover:bg-surface-overlay">Replied</button>
+                            <button data-filter="Closed"
+                                class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold transition border text-text-muted border-surface-border bg-surface-raised hover:bg-surface-overlay">Closed</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left text-sm text-text-secondary">
+                            <thead class="bg-surface-overlay text-xs text-text-muted uppercase font-semibold">
+                                <tr>
+                                    <th class="px-6 py-4">Enquiry ID</th>
+                                    <th class="px-6 py-4">Full Name</th>
+                                    <th class="px-6 py-4">Email Address</th>
+                                    <th class="px-6 py-4">Phone</th>
+                                    <th class="px-6 py-4">Monthly Volume</th>
+                                    <th class="px-6 py-4">Message Preview</th>
+                                    <th class="px-6 py-4">Date Submitted</th>
+                                    <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="enquiries-table-body" class="divide-y divide-surface-border">
+                                <tr>
+                                    <td colspan="9" class="px-6 py-12 text-center text-text-muted">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i> Loading enquiries...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Overlay for mobile sidebar -->
+        <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-10 hidden md:hidden"></div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW ENQUIRY MODAL                                                        -->
+    <!-- ========================================================================= -->
+    <div id="view-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop bg-black/60">
+        <div
+            class="bg-surface-raised rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col overflow-hidden border border-surface-border">
+            <!-- Modal Header -->
+            <div class="px-6 py-5 border-b border-surface-border flex justify-between items-center ">
+                <h3 class="text-lg font-bold text-text-primary flex items-center">
+                    <i class="fas fa-envelope-open mr-2 text-accent"></i> Enquiry Details
+                </h3>
+                <button onclick="closeViewModal()" class="text-text-muted hover:text-text-secondary transition">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-5">
+                <!-- Sender Details Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Full Name</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="modal-name">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Email
+                            Address</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="modal-email">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Phone</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="modal-phone">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Monthly
+                            Volume</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="modal-volume">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Date &amp;
+                            Time</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="modal-date">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Enquiry ID</label>
+                        <p class="text-sm font-mono text-accent mt-1" id="modal-id">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Status</label>
+                        <p class="mt-1" id="modal-status">—</p>
+                    </div>
+                </div>
+
+                <!-- Full Message -->
+                <div>
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Full Message</label>
+                    <div class="mt-2 p-4 bg-surface-overlay rounded-lg border border-surface-border text-sm text-text-secondary leading-relaxed whitespace-pre-wrap"
+                        id="modal-message">—</div>
+                </div>
+
+                <!-- Reply Section -->
+                <div>
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Reply</label>
+                    <textarea id="modal-reply" rows="4" placeholder="Type your reply here..."
+                        class="mt-2 w-full px-4 py-3 bg-surface-overlay border border-surface-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t border-surface-border  flex flex-col sm:flex-row justify-end gap-3">
+                <button onclick="closeViewModal()"
+                    class="px-4 py-2.5 text-sm font-medium text-text-secondary bg-surface-raised border border-surface-border rounded-lg hover:bg-surface-overlay transition">
+                    Cancel
+                </button>
+                <button onclick="sendReplyFromModal()"
+                    class="px-5 py-2.5 text-sm font-bold text-white bg-accent rounded-lg hover:bg-surface-raised transition flex items-center justify-center">
+                    <i class="fas fa-paper-plane mr-2"></i> Send Reply
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- DELETE CONFIRMATION MODAL                                                 -->
+    <!-- ========================================================================= -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop bg-black/60">
+        <div
+            class="bg-surface-raised rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-surface-border">
+            <!-- Modal Header -->
+            <div class="px-6 py-5 border-b border-surface-border bg-red-900/20/50">
+                <h3 class="text-lg font-bold text-red-400 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Confirm Deletion
+                </h3>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6">
+                <p class="text-sm text-text-secondary">Are you sure you want to permanently delete this enquiry? This
+                    action
+                    cannot be undone.</p>
+                <div class="mt-4 p-3 bg-surface-overlay rounded-lg border border-surface-border">
+                    <p class="text-xs text-text-muted">Enquiry ID</p>
+                    <p class="text-sm font-mono text-accent font-medium" id="delete-modal-id">—</p>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t border-surface-border  flex justify-end gap-3">
+                <button onclick="closeDeleteModal()"
+                    class="px-4 py-2.5 text-sm font-medium text-text-secondary bg-surface-raised border border-surface-border rounded-lg hover:bg-surface-overlay transition">
+                    Cancel
+                </button>
+                <button onclick="confirmDelete()"
+                    class="px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 transition flex items-center justify-center">
+                    <i class="fas fa-trash-alt mr-2"></i> Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TOAST NOTIFICATION                                                        -->
+    <!-- ========================================================================= -->
+    <div id="toast"
+        class="fixed bottom-6 right-6 z-50 hidden transform transition-all duration-300 translate-y-4 opacity-0">
+        <div class="flex items-center px-5 py-3 rounded-xl shadow-lg border text-sm font-medium" id="toast-inner">
+            <i class="mr-2" id="toast-icon"></i>
+            <span id="toast-message"></span>
+        </div>
+    </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- FIREBASE SDKs & PAGE LOGIC                                                -->
+    <!-- ========================================================================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore, doc, getDoc, collection, onSnapshot,
+            updateDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration (Identical to dashboard)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCuWWO8g2pBQlvjNUd22R9QL0AKgp2JAGg",
+            authDomain: "fortify-chargebacks.firebaseapp.com",
+            projectId: "fortify-chargebacks",
+            storageBucket: "fortify-chargebacks.firebasestorage.app",
+            messagingSenderId: "761574321330",
+            appId: "1:761574321330:web:827dc221dd6a1b64eb6dab"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // =========================================================================
+        // STATE
+        // =========================================================================
+        let allEnquiries = [];
+        let currentFilter = 'all';
+        let currentViewId = null;
+        let currentDeleteId = null;
+
+        // =========================================================================
+        // 1. AUTH & ROLE CHECK
+        // =========================================================================
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const adminDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'admins', user.uid);
+                const adminDocSnap = await getDoc(adminDocRef);
+
+                if (!adminDocSnap.exists() || adminDocSnap.data().role !== 'admin') {
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                    return;
+                }
+            } catch (error) {
+                console.warn("Admin doc read failed (rules may not be published yet):", error.message);
+            }
+            // Proceed — user is authenticated
+            document.getElementById('admin-email-display').innerText = user.email || 'Admin User';
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('dashboard-ui').classList.remove('hidden');
+            listenToEnquiries();
+        });
+
+        // 2. LOGOUT
+        window.handleLogout = async function () {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error("Error signing out:", error);
+            }
+        };
+
+        // =========================================================================
+        // 3. REAL-TIME LISTENER
+        // =========================================================================
+        function listenToEnquiries() {
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'inquiries');
+            const q = query(colRef, orderBy('timestamp', 'desc'));
+
+            onSnapshot(q, (snapshot) => {
+                allEnquiries = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                updateStats();
+                renderTable();
+            }, (error) => {
+                console.error("Real-time listener error:", error);
+                // Fallback: try without orderBy in case index doesn't exist
+                const fallbackRef = collection(db, 'artifacts', appId, 'public', 'data', 'inquiries');
+                onSnapshot(fallbackRef, (snapshot) => {
+                    allEnquiries = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    // Sort client-side
+                    allEnquiries.sort((a, b) => {
+                        const dateA = a.timestamp?.toMillis?.() || 0;
+                        const dateB = b.timestamp?.toMillis?.() || 0;
+                        return dateB - dateA;
+                    });
+                    updateStats();
+                    renderTable();
+                });
+            });
+        }
+
+        // =========================================================================
+        // 4. STATS
+        // =========================================================================
+        function updateStats() {
+            document.getElementById('stat-total').innerText = allEnquiries.length;
+            document.getElementById('stat-new').innerText = allEnquiries.filter(e => (e.status || 'New') === 'New').length;
+            document.getElementById('stat-closed').innerText = allEnquiries.filter(e => e.status === 'Closed').length;
+        }
+
+        // =========================================================================
+        // 5. RENDER TABLE
+        // =========================================================================
+        function renderTable() {
+            const tbody = document.getElementById('enquiries-table-body');
+            let filtered = allEnquiries;
+
+            if (currentFilter !== 'all') {
+                filtered = allEnquiries.filter(e => (e.status || 'New') === currentFilter);
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="px-6 py-16 text-center">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-inbox text-4xl text-text-secondary mb-3"></i>
+                            <p class="text-text-muted font-medium">No enquiries received.</p>
+                            <p class="text-text-muted text-xs mt-1">Enquiries submitted from the website will appear here.</p>
+                        </div>
+                    </td>
+                </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(e => {
+                const status = e.status || 'New';
+                const message = e.message || '';
+                const preview = message.length > 80 ? message.substring(0, 80) + '…' : message;
+
+                return `
+            <tr class="hover:bg-surface-overlay transition">
+                <td class="px-6 py-4 font-mono text-xs text-accent">${e.id.substring(0, 10).toUpperCase()}</td>
+                <td class="px-6 py-4 font-medium text-text-primary">${escapeHtml(e.name || 'Anonymous')}</td>
+                <td class="px-6 py-4 text-text-muted">${escapeHtml(e.email || 'N/A')}</td>
+                <td class="px-6 py-4 text-text-secondary text-xs">${escapeHtml(e.phone || '—')}</td>
+                <td class="px-6 py-4 text-text-secondary text-xs font-medium">${escapeHtml(e.volume || '—')}</td>
+                <td class="px-6 py-4 text-text-muted text-xs max-w-[200px]">
+                    <span class="block truncate">${escapeHtml(preview)}</span>
+                </td>
+                <td class="px-6 py-4 text-text-muted text-xs whitespace-nowrap">${formatDateTime(e.timestamp)}</td>
+                <td class="px-6 py-4">${getStatusBadge(status)}</td>
+                <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end space-x-1">
+                        <button onclick="openViewModal('${e.id}')" title="View" class="text-accent hover:text-accent-light px-2 py-1 bg-accent/10 rounded-md text-xs font-bold transition">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        ${status !== 'Replied' ? `
+                        <button onclick="markAsReplied('${e.id}')" title="Mark as Replied" class="text-yellow-400 hover:text-yellow-700 px-2 py-1 bg-yellow-900/20 rounded-md text-xs font-bold transition">
+                            <i class="fas fa-reply"></i>
+                        </button>` : ''}
+                        ${status !== 'Closed' ? `
+                        <button onclick="markAsClosed('${e.id}')" title="Close Enquiry" class="text-green-400 hover:text-green-400 px-2 py-1 bg-green-900/20 rounded-md text-xs font-bold transition">
+                            <i class="fas fa-check"></i>
+                        </button>` : ''}
+                        <button onclick="openDeleteModal('${e.id}')" title="Delete" class="text-red-400 hover:text-red-400 px-2 py-1 bg-red-900/20 rounded-md text-xs font-bold transition">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+            }).join('');
+        }
+
+        // =========================================================================
+        // 6. STATUS ACTIONS
+        // =========================================================================
+        window.markAsReplied = async function (id) {
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inquiries', id);
+                await updateDoc(docRef, { status: 'Replied', repliedAt: serverTimestamp() });
+                showToast('Enquiry marked as replied.', 'success');
+            } catch (error) {
+                console.error("Error updating status:", error);
+                showToast('Failed to update status.', 'error');
+            }
+        };
+
+        window.markAsClosed = async function (id) {
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inquiries', id);
+                await updateDoc(docRef, { status: 'Closed', closedAt: serverTimestamp() });
+                showToast('Enquiry closed successfully.', 'success');
+            } catch (error) {
+                console.error("Error closing enquiry:", error);
+                showToast('Failed to close enquiry.', 'error');
+            }
+        };
+
+        // =========================================================================
+        // 7. VIEW MODAL
+        // =========================================================================
+        window.openViewModal = function (id) {
+            const enquiry = allEnquiries.find(e => e.id === id);
+            if (!enquiry) return;
+
+            currentViewId = id;
+
+            document.getElementById('modal-name').innerText = enquiry.name || 'Anonymous';
+            document.getElementById('modal-email').innerText = enquiry.email || 'N/A';
+            document.getElementById('modal-phone').innerText = enquiry.phone || '—';
+            document.getElementById('modal-volume').innerText = enquiry.volume || '—';
+            document.getElementById('modal-date').innerText = formatDateTime(enquiry.timestamp);
+            document.getElementById('modal-id').innerText = id;
+            document.getElementById('modal-status').innerHTML = getStatusBadge(enquiry.status || 'New');
+            document.getElementById('modal-message').innerText = enquiry.message || 'No message provided.';
+            document.getElementById('modal-reply').value = '';
+
+            const modal = document.getElementById('view-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeViewModal = function () {
+            const modal = document.getElementById('view-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            currentViewId = null;
+        };
+
+        window.sendReplyFromModal = async function () {
+            if (!currentViewId) return;
+
+            const replyText = document.getElementById('modal-reply').value.trim();
+            if (!replyText) {
+                showToast('Please enter a reply message.', 'error');
+                return;
+            }
+
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inquiries', currentViewId);
+                await updateDoc(docRef, {
+                    status: 'Replied',
+                    repliedAt: serverTimestamp(),
+                    adminReply: replyText
+                });
+                showToast('Reply saved and status updated.', 'success');
+                closeViewModal();
+            } catch (error) {
+                console.error("Error sending reply:", error);
+                showToast('Failed to send reply.', 'error');
+            }
+        };
+
+        // =========================================================================
+        // 8. DELETE MODAL
+        // =========================================================================
+        window.openDeleteModal = function (id) {
+            currentDeleteId = id;
+            document.getElementById('delete-modal-id').innerText = id;
+
+            const modal = document.getElementById('delete-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeDeleteModal = function () {
+            const modal = document.getElementById('delete-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            currentDeleteId = null;
+        };
+
+        window.confirmDelete = async function () {
+            if (!currentDeleteId) return;
+
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inquiries', currentDeleteId);
+                await deleteDoc(docRef);
+                showToast('Enquiry deleted permanently.', 'success');
+                closeDeleteModal();
+            } catch (error) {
+                console.error("Error deleting enquiry:", error);
+                showToast('Failed to delete enquiry.', 'error');
+            }
+        };
+
+        // =========================================================================
+        // 9. FILTER TABS
+        // =========================================================================
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentFilter = btn.dataset.filter;
+
+                // Update active state
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active-filter', 'bg-accent', 'text-white', 'border-accent');
+                    b.classList.add('text-text-muted', 'border-surface-border', 'bg-surface-raised');
+                });
+                btn.classList.add('active-filter', 'bg-accent', 'text-white', 'border-accent');
+                btn.classList.remove('text-text-muted', 'border-surface-border', 'bg-surface-raised');
+
+                renderTable();
+            });
+        });
+
+        // Initialize the "All" button as active
+        const allBtn = document.querySelector('[data-filter="all"]');
+        if (allBtn) {
+            allBtn.classList.add('bg-accent', 'text-white', 'border-accent');
+            allBtn.classList.remove('text-text-muted', 'border-surface-border', 'bg-surface-raised');
+        }
+
+        // =========================================================================
+        // HELPERS
+        // =========================================================================
+        function getStatusBadge(status) {
+            const s = (status || '').toLowerCase();
+            if (s === 'new') {
+                return `<span class="px-2 py-1 bg-red-900/30 text-red-800 rounded text-xs font-bold border border-red-800/40">${status}</span>`;
+            } else if (s === 'replied') {
+                return `<span class="px-2 py-1 bg-yellow-900/30 text-yellow-400 rounded text-xs font-bold border border-yellow-800/40">${status}</span>`;
+            } else if (s === 'closed') {
+                return `<span class="px-2 py-1 bg-green-900/30 text-green-400 rounded text-xs font-bold border border-green-800/40">${status}</span>`;
+            }
+            return `<span class="px-2 py-1 bg-red-900/30 text-red-800 rounded text-xs font-bold border border-red-800/40">New</span>`;
+        }
+
+        function formatDateTime(val) {
+            if (!val) return '—';
+            let d;
+            if (typeof val.toDate === 'function') {
+                d = val.toDate();
+            } else {
+                d = new Date(val);
+            }
+            if (isNaN(d)) return '—';
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+                ' · ' +
+                d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const inner = document.getElementById('toast-inner');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+
+            msg.innerText = message;
+
+            // Reset classes
+            inner.className = 'flex items-center px-5 py-3 rounded-xl shadow-lg border text-sm font-medium';
+
+            if (type === 'success') {
+                inner.classList.add('bg-green-900/20', 'text-green-400', 'border-green-800/40');
+                icon.className = 'fas fa-check-circle mr-2 text-green-400';
+            } else {
+                inner.classList.add('bg-red-900/20', 'text-red-800', 'border-red-800/40');
+                icon.className = 'fas fa-exclamation-circle mr-2 text-red-600';
+            }
+
+            toast.classList.remove('hidden', 'translate-y-4', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3500);
+        }
+
+        // =========================================================================
+        // MOBILE MENU TOGGLE (Identical to dashboard)
+        // =========================================================================
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.querySelector('aside');
+        const overlay = document.getElementById('mobile-overlay');
+
+        if (mobileBtn && sidebar && overlay) {
+            mobileBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('absolute');
+                sidebar.classList.toggle('h-full');
+                overlay.classList.toggle('hidden');
+            });
+
+            overlay.addEventListener('click', () => {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('absolute');
+                sidebar.classList.remove('h-full');
+                overlay.classList.add('hidden');
+            });
+        }
+
+    </script>
+</body>
+
+</html>

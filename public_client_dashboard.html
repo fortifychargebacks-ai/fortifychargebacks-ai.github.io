@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard | Fortify Chargebacks</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="../images/Logo%201.png" type="image/png">
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind Config — IDENTICAL to index.html -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        surface: {
+                            DEFAULT: '#0f1115',
+                            raised: '#161922',
+                            overlay: '#1c2030',
+                            border: '#262b3a',
+                        },
+                        accent: {
+                            DEFAULT: '#2563eb',
+                            light: '#3b82f6',
+                            muted: '#1e3a5f',
+                        },
+                        text: {
+                            primary: '#e8eaed',
+                            secondary: '#9ca3af',
+                            muted: '#6b7280',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* =============================================
+           BASE — Identical to index.html
+           ============================================= */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #0f1115;
+            color: #e8eaed;
+        }
+
+        /* Scroll-triggered reveal animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 {
+            transition-delay: 0.12s;
+        }
+
+        .reveal-delay-2 {
+            transition-delay: 0.24s;
+        }
+
+        .reveal-delay-3 {
+            transition-delay: 0.36s;
+        }
+
+        .reveal-delay-4 {
+            transition-delay: 0.48s;
+        }
+
+        /* Subtle line glow */
+        .line-glow {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #2563eb, transparent);
+        }
+
+        /* Custom scrollbar — Identical to index.html */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #262b3a;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        /* Nav blur — Identical to index.html */
+        .nav-blur {
+            background: rgba(15, 17, 21, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Floating dot grid background — Identical to index.html */
+        .dot-grid {
+            background-image: radial-gradient(circle, #262b3a 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* =============================================
+           DASHBOARD-SPECIFIC STYLES
+           ============================================= */
+
+        /* Tab active state — matches index Knowledge Base tabs */
+        .filter-tab {
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .filter-tab.active {
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
+        .badge-won {
+            background: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .badge-lost {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .badge-open {
+            background: rgba(37, 99, 235, 0.1);
+            color: #60a5fa;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .badge-admin-review {
+            background: rgba(249, 115, 22, 0.1);
+            color: #fb923c;
+            border: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .badge-in-progress {
+            background: rgba(139, 92, 246, 0.1);
+            color: #a78bfa;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        /* Table row hover — matches index table */
+        .case-row {
+            transition: background-color 0.3s ease;
+        }
+
+        .case-row:hover {
+            background-color: rgba(28, 32, 48, 0.5);
+        }
+
+        /* Modal backdrop — matches index overlay feel */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Modal enter animation */
+        .modal-panel {
+            transform: translateY(16px) scale(0.98);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-panel.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        /* Upload drop zone */
+        .upload-zone {
+            border: 2px dashed #262b3a;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: #2563eb;
+            background-color: rgba(37, 99, 235, 0.04);
+        }
+
+        /* Client dropdown */
+        .client-dropdown {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: all 0.2s ease;
+        }
+
+        .client-dropdown.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Spinner */
+        @keyframes dash-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner-ring {
+            border: 3px solid #262b3a;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: dash-spin 0.7s linear infinite;
+        }
+
+        /* Pulse — for active timeline dot */
+        @keyframes pulse-accent {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(37, 99, 235, 0);
+            }
+        }
+
+        .pulse-dot {
+            animation: pulse-accent 2s ease-in-out infinite;
+        }
+
+        /* Responsive table scroll shadow hint */
+        .table-scroll-container {
+            position: relative;
+        }
+
+        .table-scroll-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 40px;
+            background: linear-gradient(90deg, transparent, #161922);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .table-scroll-container.has-scroll::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- ======== LOADING OVERLAY ======== -->
+    <div id="loading-overlay"
+        class="fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-500"
+        style="background-color: #0f1115;">
+        <div class="relative mb-6">
+            <div class="spinner-ring"></div>
+        </div>
+        <p class="text-text-secondary text-sm font-medium tracking-wide">Verifying Session...</p>
+        <p class="text-text-muted text-xs mt-2">Fortify Chargebacks</p>
+    </div>
+
+    <!-- ======== PROTECTED APP SHELL ======== -->
+    <div id="protected-content" class="hidden flex-col min-h-screen">
+
+        <!-- ======== NAVIGATION ======== -->
+        <nav class="nav-blur fixed w-full z-50 border-b border-surface-border/50">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <!-- Logo -->
+                    <div class="flex items-center cursor-pointer" onclick="window.location.href='../index.html'">
+                        <img class="h-10 w-auto mr-3" src="../images/Logo%201.png" alt="Fortify"
+                            onerror="this.style.display='none'; document.getElementById('nav-text-logo').classList.remove('hidden');">
+                        <div>
+                            <span id="nav-text-logo"
+                                class="font-bold text-lg tracking-tight text-text-primary">FORTIFY
+                                <span class="text-text-muted">PORTAL</span></span>
+                            <p class="text-[10px] text-text-muted tracking-wide hidden lg:block">Client Dashboard —
+                                Secure Access</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Side -->
+                    <div class="flex items-center gap-3">
+                        <!-- Back to Website (Desktop) -->
+                        <a href="../index.html"
+                            class="hidden md:flex items-center gap-2 text-text-muted hover:text-text-secondary text-xs font-medium transition duration-300 mr-2">
+                            <i class="fas fa-arrow-left text-[10px]"></i>
+                            Website
+                        </a>
+                        <div class="hidden md:block w-[1px] h-5 bg-surface-border/50"></div>
+
+                        <!-- Client Dropdown -->
+                        <div class="relative">
+                            <button id="client-dropdown-trigger" onclick="toggleClientDropdown()"
+                                class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-surface-overlay transition duration-300">
+                                <div
+                                    class="w-9 h-9 rounded-full bg-accent/10 border border-accent/25 flex items-center justify-center">
+                                    <span id="nav-avatar" class="text-accent text-xs font-bold">—</span>
+                                </div>
+                                <div class="hidden sm:block text-left">
+                                    <p id="nav-client-name"
+                                        class="text-text-primary text-sm font-medium leading-tight truncate max-w-[140px]">
+                                        Loading...</p>
+                                    <p id="nav-client-email"
+                                        class="text-text-muted text-[10px] leading-tight truncate max-w-[140px]">—</p>
+                                </div>
+                                <i
+                                    class="fas fa-chevron-down text-text-muted text-[9px] ml-1 transition-transform duration-200"
+                                    id="dropdown-chevron"></i>
+                            </button>
+
+                            <!-- Dropdown -->
+                            <div id="client-dropdown"
+                                class="client-dropdown absolute right-0 mt-2 w-60 bg-surface-raised border border-surface-border/50 rounded-xl shadow-2xl overflow-hidden">
+                                <div class="px-5 py-4 border-b border-surface-border/30">
+                                    <p id="dd-name" class="text-text-primary text-sm font-semibold truncate">—</p>
+                                    <p id="dd-email" class="text-text-muted text-xs truncate mt-0.5">—</p>
+                                </div>
+                                <div class="py-1.5">
+                                    <a href="../index.html"
+                                        class="flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-overlay transition duration-200">
+                                        <i class="fas fa-globe text-xs w-4 text-center"></i>
+                                        Back to Website
+                                    </a>
+                                    <button onclick="handleLogout()"
+                                        class="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition duration-200">
+                                        <i class="fas fa-sign-out-alt text-xs w-4 text-center"></i>
+                                        Sign Out
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Hamburger -->
+                        <button id="mobile-menu-btn" onclick="toggleMobileMenu()"
+                            class="md:hidden text-text-secondary hover:text-text-primary p-2">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden bg-surface border-t border-surface-border">
+                <div class="px-6 py-5 space-y-1">
+                    <div class="flex items-center gap-3 pb-4 border-b border-surface-border/50">
+                        <div
+                            class="w-9 h-9 rounded-full bg-accent/10 border border-accent/25 flex items-center justify-center">
+                            <span id="mobile-avatar" class="text-accent text-xs font-bold">—</span>
+                        </div>
+                        <div>
+                            <p id="mobile-name" class="text-text-primary text-sm font-medium">Loading...</p>
+                            <p id="mobile-email" class="text-text-muted text-[10px]">—</p>
+                        </div>
+                    </div>
+                    <a href="../index.html"
+                        class="block py-3 text-text-secondary hover:text-text-primary text-sm font-medium border-b border-surface-border/50">
+                        <i class="fas fa-arrow-left mr-2 text-xs"></i>Back to Website
+                    </a>
+                    <button onclick="handleLogout()"
+                        class="block w-full text-left py-3 text-red-400 hover:text-red-300 text-sm font-medium">
+                        <i class="fas fa-sign-out-alt mr-2 text-xs"></i>Sign Out
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ======== MAIN CONTENT ======== -->
+        <main class="flex-grow pt-20">
+
+            <!-- ======== WELCOME HERO ======== -->
+            <section class="relative py-16 md:py-20 overflow-hidden">
+                <div class="absolute inset-0 dot-grid opacity-20 pointer-events-none"></div>
+                <div
+                    class="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-accent/4 rounded-full blur-[100px] pointer-events-none">
+                </div>
+
+                <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+                    <div
+                        class="reveal flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                        <div>
+                            <p class="text-accent text-xs font-semibold tracking-[0.3em] uppercase mb-3">Client
+                                Portal</p>
+                            <h1
+                                class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-text-primary">
+                                Welcome back<span id="welcome-comma" class="hidden">,</span><br
+                                    class="hidden sm:block">
+                                <span id="welcome-name" class="text-accent"></span>
+                            </h1>
+                            <p class="text-text-secondary text-sm md:text-base font-light mt-3 max-w-lg leading-relaxed">
+                                Monitor your submitted chargeback cases and account activity.</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <a href="./submit-case.html"
+                                class="inline-flex items-center gap-2 border border-accent/50 text-accent hover:bg-accent hover:text-white px-6 py-3 rounded-full text-sm font-medium transition duration-300">
+                                <i class="fas fa-plus text-xs"></i>
+                                Submit New Case
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======== KPI SUMMARY CARDS ======== -->
+            <section class="pb-10 relative z-10">
+                <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Total Disputes -->
+                        <div class="reveal group">
+                            <div
+                                class="bg-surface-raised border border-surface-border/50 rounded-2xl p-7 hover:border-accent/30 transition duration-500 h-full">
+                                <div class="flex items-center justify-between mb-5">
+                                    <div
+                                        class="w-10 h-10 border border-accent/30 rounded-lg flex items-center justify-center group-hover:bg-accent/10 transition duration-300">
+                                        <i class="fas fa-folder-open text-accent text-sm"></i>
+                                    </div>
+                                    <span
+                                        class="text-text-muted text-[10px] font-semibold tracking-[0.2em] uppercase">Total</span>
+                                </div>
+                                <p class="text-3xl font-bold text-text-primary leading-none mb-1.5" id="kpi-total">—</p>
+                                <p class="text-text-muted text-xs">All submitted cases</p>
+                            </div>
+                        </div>
+
+                        <!-- Cases Won -->
+                        <div class="reveal reveal-delay-1 group">
+                            <div
+                                class="bg-surface-raised border border-surface-border/50 rounded-2xl p-7 hover:border-green-500/30 transition duration-500 h-full">
+                                <div class="flex items-center justify-between mb-5">
+                                    <div
+                                        class="w-10 h-10 border border-green-500/30 rounded-lg flex items-center justify-center group-hover:bg-green-500/10 transition duration-300">
+                                        <i class="fas fa-trophy text-green-400 text-sm"></i>
+                                    </div>
+                                    <span
+                                        class="text-text-muted text-[10px] font-semibold tracking-[0.2em] uppercase">Won</span>
+                                </div>
+                                <p class="text-3xl font-bold text-text-primary leading-none mb-1.5" id="kpi-won">—</p>
+                                <p class="text-green-400/80 text-xs font-medium">Successfully defended</p>
+                            </div>
+                        </div>
+
+                        <!-- Pending / Active -->
+                        <div class="reveal reveal-delay-2 group">
+                            <div
+                                class="bg-surface-raised border border-surface-border/50 rounded-2xl p-7 hover:border-amber-500/30 transition duration-500 h-full">
+                                <div class="flex items-center justify-between mb-5">
+                                    <div
+                                        class="w-10 h-10 border border-amber-500/30 rounded-lg flex items-center justify-center group-hover:bg-amber-500/10 transition duration-300">
+                                        <i class="fas fa-hourglass-half text-amber-400 text-sm"></i>
+                                    </div>
+                                    <span
+                                        class="text-text-muted text-[10px] font-semibold tracking-[0.2em] uppercase">Active</span>
+                                </div>
+                                <p class="text-3xl font-bold text-text-primary leading-none mb-1.5" id="kpi-pending">—
+                                </p>
+                                <p class="text-text-muted text-xs">In progress or pending</p>
+                            </div>
+                        </div>
+
+                        <!-- Recovered Revenue -->
+                        <div class="reveal reveal-delay-3 group">
+                            <div
+                                class="bg-surface-raised border border-surface-border/50 rounded-2xl p-7 hover:border-accent/30 transition duration-500 h-full">
+                                <div class="flex items-center justify-between mb-5">
+                                    <div
+                                        class="w-10 h-10 border border-accent/30 rounded-lg flex items-center justify-center group-hover:bg-accent/10 transition duration-300">
+                                        <i class="fas fa-dollar-sign text-accent text-sm"></i>
+                                    </div>
+                                    <span
+                                        class="text-text-muted text-[10px] font-semibold tracking-[0.2em] uppercase">Recovered</span>
+                                </div>
+                                <p class="text-3xl font-bold text-text-primary leading-none mb-1.5" id="kpi-recovered">—
+                                </p>
+                                <p class="text-text-muted text-xs">Revenue secured</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======== CASES TABLE ======== -->
+            <section class="pb-24 md:pb-32 relative z-10">
+                <div class="max-w-7xl mx-auto px-6 lg:px-8">
+
+                    <!-- Section Header -->
+                    <div class="reveal mb-5">
+                        <p class="text-accent text-xs font-semibold tracking-[0.3em] uppercase">Your Cases</p>
+                    </div>
+                    <div class="reveal reveal-delay-1 mb-6">
+                        <h2 class="text-2xl md:text-3xl font-bold text-text-primary leading-tight">Case Management</h2>
+                    </div>
+                    <div class="line-glow mb-8 reveal reveal-delay-2"></div>
+
+                    <!-- Filter Tabs + Search Row -->
+                    <div
+                        class="reveal flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                        <!-- Tabs -->
+                        <div class="flex gap-0.5 overflow-x-auto pb-1 -mb-[1px]">
+                            <button onclick="setFilter('all')" data-filter="all"
+                                class="filter-tab active px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-text-muted hover:text-text-secondary transition">
+                                All
+                                <span
+                                    class="ml-1 text-[10px] bg-surface-overlay border border-surface-border/50 px-2 py-0.5 rounded-full"
+                                    id="count-all">0</span>
+                            </button>
+                            <button onclick="setFilter('active')" data-filter="active"
+                                class="filter-tab px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-text-muted hover:text-text-secondary transition">
+                                Active
+                                <span
+                                    class="ml-1 text-[10px] bg-surface-overlay border border-surface-border/50 px-2 py-0.5 rounded-full"
+                                    id="count-active">0</span>
+                            </button>
+                            <button onclick="setFilter('pending')" data-filter="pending"
+                                class="filter-tab px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-text-muted hover:text-text-secondary transition">
+                                Pending Review
+                                <span
+                                    class="ml-1 text-[10px] bg-surface-overlay border border-surface-border/50 px-2 py-0.5 rounded-full"
+                                    id="count-pending">0</span>
+                            </button>
+                            <button onclick="setFilter('won')" data-filter="won"
+                                class="filter-tab px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-text-muted hover:text-text-secondary transition">
+                                Won
+                                <span
+                                    class="ml-1 text-[10px] bg-surface-overlay border border-surface-border/50 px-2 py-0.5 rounded-full"
+                                    id="count-won">0</span>
+                            </button>
+                            <button onclick="setFilter('lost')" data-filter="lost"
+                                class="filter-tab px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-text-muted hover:text-text-secondary transition">
+                                Lost
+                                <span
+                                    class="ml-1 text-[10px] bg-surface-overlay border border-surface-border/50 px-2 py-0.5 rounded-full"
+                                    id="count-lost">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Search -->
+                        <div class="relative flex-shrink-0">
+                            <i
+                                class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-xs"></i>
+                            <input id="search-input" type="text"
+                                placeholder="Search by ID, amount, network..."
+                                oninput="handleSearch(this.value)"
+                                class="w-full lg:w-72 pl-10 pr-4 py-2.5 rounded-lg bg-surface-raised border border-surface-border/50 text-text-primary placeholder-text-muted text-sm focus:border-accent/50 focus:ring-1 focus:ring-accent/20 outline-none transition">
+                        </div>
+                    </div>
+
+                    <!-- Table Card -->
+                    <div
+                        class="reveal bg-surface-raised border border-surface-border/50 rounded-2xl overflow-hidden">
+
+                        <!-- Table Loading -->
+                        <div id="table-loading" class="flex flex-col items-center justify-center py-20">
+                            <div class="spinner-ring mb-4"></div>
+                            <p class="text-text-muted text-sm">Loading your cases...</p>
+                        </div>
+
+                        <!-- Table Empty State -->
+                        <div id="table-empty" class="hidden flex-col items-center justify-center py-20 px-6">
+                            <div
+                                class="w-16 h-16 border border-surface-border/50 rounded-2xl flex items-center justify-center mb-5">
+                                <i class="fas fa-inbox text-text-muted text-2xl"></i>
+                            </div>
+                            <p class="text-text-primary text-lg font-semibold mb-2">No cases found</p>
+                            <p class="text-text-muted text-sm text-center max-w-sm mb-6">
+                                You haven't submitted any chargeback cases yet, or no cases match your current filter.
+                            </p>
+                            <a href="./submit-case.html"
+                                class="inline-flex items-center gap-2 border border-accent/50 text-accent hover:bg-accent hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition duration-300">
+                                <i class="fas fa-plus text-xs"></i>
+                                Submit Your First Case
+                            </a>
+                        </div>
+
+                        <!-- Table Content -->
+                        <div id="table-wrapper" class="hidden">
+                            <div class="table-scroll-container overflow-x-auto" id="table-scroll">
+                                <table class="w-full text-left text-sm min-w-[800px]">
+                                    <thead
+                                        class="text-text-muted text-xs uppercase tracking-wider border-b border-surface-border/30 bg-surface-overlay/40">
+                                        <tr>
+                                            <th class="px-6 py-4 font-semibold">Case ID</th>
+                                            <th class="px-6 py-4 font-semibold">Amount</th>
+                                            <th class="px-6 py-4 font-semibold">Bank / Network</th>
+                                            <th class="px-6 py-4 font-semibold">Status</th>
+                                            <th class="px-6 py-4 font-semibold">Priority</th>
+                                            <th class="px-6 py-4 font-semibold">Last Updated</th>
+                                            <th class="px-6 py-4 font-semibold text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cases-tbody"
+                                        class="divide-y divide-surface-border/20 text-text-secondary">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Footer Note -->
+                    <div class="reveal mt-5">
+                        <p class="text-text-muted text-xs italic">
+                            <i class="fas fa-info-circle mr-1.5 text-accent/60"></i>Cases are updated in real time.
+                            Contact <a href="mailto:support@fortifychargebacks.com"
+                                class="text-accent hover:underline">support@fortifychargebacks.com</a> if you believe
+                            any information is incorrect.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ======== FOOTER ======== -->
+        <footer class="border-t border-surface-border/50 py-10 mt-auto">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <img src="../images/Logo%202.png" alt="Fortify Chargebacks" class="h-6 w-auto"
+                            onerror="this.style.display='none';">
+                        <span class="font-bold text-sm text-text-secondary tracking-tight">FORTIFY <span
+                                class="text-text-muted">CHARGEBACKS</span></span>
+                    </div>
+                    <p class="text-text-muted text-xs">&copy; 2026 Fortify Chargebacks. All data is encrypted and
+                        strictly confidential.</p>
+                    <div class="flex gap-6">
+                        <a href="../index.html"
+                            class="text-text-muted hover:text-text-primary text-xs transition duration-300">Home</a>
+                        <a href="mailto:support@fortifychargebacks.com"
+                            class="text-text-muted hover:text-text-primary text-xs transition duration-300">Support</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ======== CASE DETAILS MODAL ======== -->
+    <div id="case-modal" class="fixed inset-0 z-[90] hidden items-center justify-center p-4 md:p-8">
+        <!-- Backdrop -->
+        <div class="modal-backdrop absolute inset-0" onclick="closeModal()"></div>
+
+        <!-- Modal Panel -->
+        <div id="modal-panel"
+            class="modal-panel relative bg-surface-raised border border-surface-border/50 rounded-2xl w-full max-w-3xl max-h-[92vh] overflow-hidden shadow-2xl z-10 flex flex-col">
+
+            <!-- Modal Header (sticky) -->
+            <div
+                class="sticky top-0 bg-surface-raised/95 backdrop-blur-sm border-b border-surface-border/30 px-6 md:px-8 py-5 flex items-center justify-between z-10 flex-shrink-0">
+                <div>
+                    <p class="text-accent text-[10px] font-semibold tracking-[0.3em] uppercase mb-1">Case Details</p>
+                    <h3 id="modal-case-id" class="text-lg md:text-xl font-bold text-text-primary">—</h3>
+                </div>
+                <button onclick="closeModal()"
+                    class="w-9 h-9 rounded-lg border border-surface-border/50 flex items-center justify-center text-text-muted hover:text-text-primary hover:border-text-muted transition duration-300 flex-shrink-0">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (scrollable) -->
+            <div class="overflow-y-auto flex-grow px-6 md:px-8 py-8 space-y-9">
+
+                <!-- Status + Priority Row -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <span id="modal-status-badge" class="badge badge-open">—</span>
+                    <span id="modal-priority-text" class="text-xs font-medium text-text-muted">—</span>
+                </div>
+
+                <!-- Case Information Grid -->
+                <div>
+                    <h4 class="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
+                        <i class="fas fa-info-circle text-accent text-xs"></i> Case Information
+                    </h4>
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-surface-overlay/40 border border-surface-border/30 rounded-xl p-6">
+                        <div>
+                            <p class="text-text-muted text-[10px] uppercase tracking-wider mb-1">Transaction Amount</p>
+                            <p id="modal-amount" class="text-text-primary text-sm font-semibold">—</p>
+                        </div>
+                        <div>
+                            <p class="text-text-muted text-[10px] uppercase tracking-wider mb-1">Bank / Network</p>
+                            <p id="modal-bank" class="text-text-primary text-sm font-semibold">—</p>
+                        </div>
+                        <div>
+                            <p class="text-text-muted text-[10px] uppercase tracking-wider mb-1">Reason Code</p>
+                            <p id="modal-reason" class="text-text-primary text-sm font-semibold">—</p>
+                        </div>
+                        <div>
+                            <p class="text-text-muted text-[10px] uppercase tracking-wider mb-1">Processor</p>
+                            <p id="modal-processor" class="text-text-primary text-sm font-semibold">—</p>
+                        </div>
+                        <div>
+                            <p class="text-text-muted text-[10px] uppercase tracking-wider mb-1">Date Submitted</p>
+                            <p id="modal-submitted" class="text-text-primary text-sm font-semibold">—</p>
+                        </div>
+                        <div>
+                            <p class="text-text-muted text-[10px] uppercase tracking-wider mb-1">Last Updated</p>
+                            <p id="modal-updated" class="text-text-primary text-sm font-semibold">—</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="line-glow"></div>
+
+                <!-- Case Timeline -->
+                <div>
+                    <h4 class="text-sm font-semibold text-text-primary mb-5 flex items-center gap-2">
+                        <i class="fas fa-stream text-accent text-xs"></i> Case Timeline
+                    </h4>
+                    <div id="modal-timeline">
+                        <p class="text-text-muted text-sm italic">No timeline events yet.</p>
+                    </div>
+                </div>
+
+                <div class="line-glow"></div>
+
+                <!-- Uploaded Documents -->
+                <div>
+                    <h4 class="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
+                        <i class="fas fa-paperclip text-accent text-xs"></i> Documents
+                    </h4>
+                    <div id="modal-documents">
+                        <p class="text-text-muted text-sm italic">No documents attached.</p>
+                    </div>
+                </div>
+
+                <div class="line-glow"></div>
+
+                <!-- Admin Request Section (conditionally shown) -->
+                <div id="modal-admin-section" class="hidden">
+                    <h4 class="text-sm font-semibold mb-3 flex items-center gap-2">
+                        <i class="fas fa-comment-dots text-orange-400 text-xs"></i>
+                        <span class="text-orange-400">Action Required</span>
+                        <span class="text-text-primary">— Information Requested</span>
+                    </h4>
+
+                    <!-- Admin message -->
+                    <div class="bg-orange-500/5 border border-orange-500/20 rounded-xl p-5 mb-5">
+                        <p id="modal-admin-notes" class="text-text-secondary text-sm leading-relaxed">—</p>
+                    </div>
+
+                    <!-- Existing client reply -->
+                    <div id="modal-existing-reply-wrapper" class="hidden mb-5">
+                        <p class="text-text-muted text-[10px] uppercase tracking-wider mb-2">Your Previous Reply</p>
+                        <div class="bg-accent/5 border border-accent/15 rounded-xl p-4">
+                            <p id="modal-existing-reply" class="text-text-secondary text-sm leading-relaxed">—</p>
+                        </div>
+                    </div>
+
+                    <!-- Reply textarea -->
+                    <div class="mb-4">
+                        <label
+                            class="block text-text-muted text-[10px] uppercase tracking-wider mb-2">Your
+                            Response</label>
+                        <textarea id="modal-reply-input" rows="3"
+                            class="w-full px-4 py-3 rounded-lg bg-surface border border-surface-border/50 text-text-primary placeholder-text-muted text-sm focus:border-accent/50 focus:ring-1 focus:ring-accent/20 outline-none transition resize-none"
+                            placeholder="Type your response to the admin request..."></textarea>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="mb-4">
+                        <label class="block text-text-muted text-[10px] uppercase tracking-wider mb-2">Attach
+                            Additional Documents</label>
+                        <div id="modal-upload-zone" class="upload-zone rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer"
+                            onclick="document.getElementById('modal-file-input').click()">
+                            <i class="fas fa-cloud-upload-alt text-text-muted text-lg mb-2"></i>
+                            <p class="text-text-secondary text-sm font-medium">Click to upload or drag files here</p>
+                            <p class="text-text-muted text-xs mt-1">PDF, PNG, JPG — up to 10MB each</p>
+                            <input id="modal-file-input" type="file" multiple accept=".pdf,.png,.jpg,.jpeg"
+                                class="hidden" onchange="handleModalFiles(event)">
+                        </div>
+                        <div id="modal-files-list" class="mt-3 space-y-2"></div>
+                    </div>
+
+                    <!-- Submit button -->
+                    <button onclick="submitReply()" id="modal-reply-btn"
+                        class="w-full border border-accent/50 text-accent hover:bg-accent hover:text-white font-medium py-3 rounded-lg transition duration-300 flex items-center justify-center gap-2 text-sm">
+                        <span>Submit Response</span>
+                        <i class="fas fa-paper-plane text-xs"></i>
+                    </button>
+                    <div id="modal-reply-status"
+                        class="hidden rounded-lg p-3 text-center text-sm font-medium mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== CURSOR-TRACKING GLOBE / AMBIENT ORB ======== -->
+    <div id="cursor-globe" style="
+        position: fixed; top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        pointer-events: none; z-index: 0; overflow: hidden;">
+        <div id="orb-primary" style="
+            position: absolute; width: 700px; height: 700px; border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(37,99,235,0.08) 0%, rgba(37,99,235,0.04) 30%, rgba(37,99,235,0.015) 55%, transparent 75%);
+            transform: translate(-50%,-50%); will-change: transform; filter: blur(2px);"></div>
+        <div id="orb-secondary" style="
+            position: absolute; width: 400px; height: 400px; border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(59,130,246,0.06) 0%, rgba(59,130,246,0.025) 40%, transparent 70%);
+            transform: translate(-50%,-50%); will-change: transform; filter: blur(1px);"></div>
+        <div id="orb-tertiary" style="
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(139,92,246,0.04) 0%, rgba(139,92,246,0.015) 45%, transparent 70%);
+            transform: translate(-50%,-50%); will-change: transform; filter: blur(3px);"></div>
+        <canvas id="cursor-grid-canvas" style="
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.04;"></canvas>
+    </div>
+
+    <!-- ======== FIREBASE + DASHBOARD ENGINE ======== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore, doc, getDoc, collection, onSnapshot, updateDoc, serverTimestamp, query, where
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import {
+            getStorage, ref as storageRef, uploadBytes, getDownloadURL
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        // =============================================
+        //  FIREBASE INIT
+        // =============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCuWWO8g2pBQlvjNUd22R9QL0AKgp2JAGg",
+            authDomain: "fortify-chargebacks.firebaseapp.com",
+            projectId: "fortify-chargebacks",
+            storageBucket: "fortify-chargebacks.firebasestorage.app",
+            messagingSenderId: "761574321330",
+            appId: "1:761574321330:web:827dc221dd6a1b64eb6dab"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // =============================================
+        //  STATE
+        // =============================================
+        let allCases = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let currentUser = null;
+        let currentModalCase = null;
+        let modalFiles = [];
+        let unsubCases = null;
+
+        // =============================================
+        //  AUTH GUARD
+        // =============================================
+        onAuthStateChanged(auth, async (user) => {
+            const overlay = document.getElementById('loading-overlay');
+            const content = document.getElementById('protected-content');
+
+            if (!user) {
+                window.location.href = './login.html';
+                return;
+            }
+
+            try {
+                // Verify client role
+                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'clients', user.uid);
+                const snap = await getDoc(userRef);
+
+                if (!snap.exists() || snap.data().role !== 'client') {
+                    await signOut(auth);
+                    window.location.href = './login.html';
+                    return;
+                }
+
+                currentUser = user;
+                const userData = snap.data();
+                const displayName = userData.fullName || user.displayName || user.email || 'Client';
+                const email = user.email || '';
+                const initial = displayName.charAt(0).toUpperCase();
+
+                // Populate nav elements
+                setTextContent('nav-avatar', initial);
+                setTextContent('nav-client-name', displayName);
+                setTextContent('nav-client-email', email);
+                setTextContent('dd-name', displayName);
+                setTextContent('dd-email', email);
+                setTextContent('mobile-avatar', initial);
+                setTextContent('mobile-name', displayName);
+                setTextContent('mobile-email', email);
+
+                // Welcome section
+                const firstName = displayName.split(' ')[0];
+                const welcomeName = document.getElementById('welcome-name');
+                const welcomeComma = document.getElementById('welcome-comma');
+                if (firstName) {
+                    welcomeName.textContent = firstName + '.';
+                    welcomeComma.classList.remove('hidden');
+                }
+
+                // Start listening for cases
+                startCasesListener(user.uid);
+
+            } catch (err) {
+                console.error('Auth verification failed:', err);
+                await signOut(auth);
+                window.location.href = './login.html';
+                return;
+            }
+
+            // Show app
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                content.classList.remove('hidden');
+                content.classList.add('flex');
+                initRevealObserver();
+                checkTableScroll();
+            }, 400);
+        });
+
+        // =============================================
+        //  CASES LISTENER
+        // =============================================
+        function startCasesListener(uid) {
+            if (unsubCases) unsubCases();
+
+            const casesRef = collection(db, 'artifacts', appId, 'public', 'data', 'cases');
+            const q = query(casesRef, where('clientId', '==', uid));
+
+            unsubCases = onSnapshot(q, (snapshot) => {
+                allCases = [];
+                snapshot.forEach(d => {
+                    allCases.push({ id: d.id, ...d.data() });
+                });
+
+                // Sort by updatedAt descending
+                allCases.sort((a, b) => {
+                    const da = toDate(a.updatedAt || a.createdAt);
+                    const db2 = toDate(b.updatedAt || b.createdAt);
+                    return db2 - da;
+                });
+
+                computeKPIs();
+                renderTable();
+            }, (err) => {
+                console.error('Cases listener error:', err);
+                document.getElementById('table-loading').classList.add('hidden');
+                showEmpty();
+            });
+        }
+
+        // =============================================
+        //  KPIs
+        // =============================================
+        function computeKPIs() {
+            const total = allCases.length;
+            const won = allCases.filter(c => c.status === 'Won').length;
+            const lost = allCases.filter(c => c.status === 'Lost').length;
+            const pending = total - won - lost;
+            const recovered = allCases
+                .filter(c => c.status === 'Won')
+                .reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+
+            setTextContent('kpi-total', total);
+            setTextContent('kpi-won', won);
+            setTextContent('kpi-pending', pending);
+            setTextContent('kpi-recovered', '$' + recovered.toLocaleString('en-US', {
+                minimumFractionDigits: 2, maximumFractionDigits: 2
+            }));
+
+            // Tab counts
+            const active = allCases.filter(c => !['Won', 'Lost'].includes(c.status) && c.status !== 'Pending Admin Review').length;
+            const pendingReview = allCases.filter(c => c.status === 'Pending Admin Review').length;
+
+            setTextContent('count-all', total);
+            setTextContent('count-active', active);
+            setTextContent('count-pending', pendingReview);
+            setTextContent('count-won', won);
+            setTextContent('count-lost', lost);
+        }
+
+        // =============================================
+        //  TABLE RENDERING
+        // =============================================
+        function renderTable() {
+            const loading = document.getElementById('table-loading');
+            const empty = document.getElementById('table-empty');
+            const wrapper = document.getElementById('table-wrapper');
+            const tbody = document.getElementById('cases-tbody');
+
+            loading.classList.add('hidden');
+
+            let filtered = [...allCases];
+
+            // Apply filter
+            if (currentFilter === 'active') {
+                filtered = filtered.filter(c => !['Won', 'Lost', 'Pending Admin Review'].includes(c.status));
+            } else if (currentFilter === 'pending') {
+                filtered = filtered.filter(c => c.status === 'Pending Admin Review');
+            } else if (currentFilter === 'won') {
+                filtered = filtered.filter(c => c.status === 'Won');
+            } else if (currentFilter === 'lost') {
+                filtered = filtered.filter(c => c.status === 'Lost');
+            }
+
+            // Apply search
+            if (currentSearch) {
+                const term = currentSearch.toLowerCase();
+                filtered = filtered.filter(c =>
+                    (c.transactionId || c.caseId || c.title || '').toLowerCase().includes(term) ||
+                    (c.amount || '').toString().includes(term) ||
+                    (c.network || '').toLowerCase().includes(term) ||
+                    (c.bank || '').toLowerCase().includes(term) ||
+                    (c.reasonCode || '').toLowerCase().includes(term) ||
+                    (c.status || '').toLowerCase().includes(term)
+                );
+            }
+
+            if (filtered.length === 0) {
+                showEmpty();
+                wrapper.classList.add('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            empty.style.display = 'none';
+            wrapper.classList.remove('hidden');
+
+            tbody.innerHTML = '';
+            filtered.forEach(c => {
+                const caseId = c.transactionId || c.caseId || c.title || '—';
+                const amount = c.amount ? '$' + parseFloat(c.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '—';
+                const bankNetwork = c.bank || c.network || '—';
+                const status = c.status || 'Open';
+                const priority = c.priority || '—';
+                const updated = formatRelativeDate(c.updatedAt || c.createdAt);
+                const hasAdminNotes = !!c.adminNotes;
+
+                const row = document.createElement('tr');
+                row.className = 'case-row cursor-pointer';
+                row.onclick = () => openCaseModal(c);
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="font-semibold text-accent">${esc(caseId)}</span>
+                        ${hasAdminNotes ? '<span class="ml-2 inline-block w-2 h-2 bg-orange-400 rounded-full" title="Admin request pending"></span>' : ''}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-text-primary font-medium">${esc(amount)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-text-primary text-sm">${esc(bankNetwork)}</span>
+                        ${c.reasonCode ? `<span class="block text-text-muted text-[11px] mt-0.5">${esc(c.reasonCode)}</span>` : ''}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="badge ${getStatusBadgeClass(status)}">${esc(status)}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-xs font-semibold flex items-center gap-1.5 ${getPriorityColor(priority)}">
+                            <i class="${getPriorityIcon(priority)} text-[10px]"></i>${esc(priority)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-text-muted text-xs">${updated}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <span class="text-accent hover:text-accent-light text-xs font-medium transition duration-300">
+                            View <i class="fas fa-arrow-right ml-1 text-[10px]"></i>
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            checkTableScroll();
+        }
+
+        function showEmpty() {
+            const empty = document.getElementById('table-empty');
+            empty.classList.remove('hidden');
+            empty.style.display = 'flex';
+        }
+
+        // =============================================
+        //  MODAL — OPEN
+        // =============================================
+        function openCaseModal(c) {
+            currentModalCase = c;
+            modalFiles = [];
+            document.getElementById('modal-files-list').innerHTML = '';
+            document.getElementById('modal-reply-input').value = '';
+            document.getElementById('modal-reply-status').classList.add('hidden');
+
+            const modal = document.getElementById('case-modal');
+            const panel = document.getElementById('modal-panel');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+
+            // Animate in
+            requestAnimationFrame(() => {
+                panel.classList.add('open');
+            });
+
+            // Case ID
+            setTextContent('modal-case-id', c.transactionId || c.caseId || c.title || '—');
+
+            // Status badge
+            const statusEl = document.getElementById('modal-status-badge');
+            statusEl.textContent = c.status || 'Open';
+            statusEl.className = `badge ${getStatusBadgeClass(c.status || 'Open')}`;
+
+            // Priority
+            const prioEl = document.getElementById('modal-priority-text');
+            const prio = c.priority || '—';
+            prioEl.innerHTML = `<i class="${getPriorityIcon(prio)} mr-1 text-[10px]"></i>${esc(prio)} Priority`;
+            prioEl.className = `text-xs font-medium ${getPriorityColor(prio)}`;
+
+            // Info grid
+            setTextContent('modal-amount', c.amount ? '$' + parseFloat(c.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '—');
+            setTextContent('modal-bank', c.bank || c.network || '—');
+            setTextContent('modal-reason', c.reasonCode || '—');
+            setTextContent('modal-processor', c.processor || '—');
+            setTextContent('modal-submitted', formatFullDate(c.createdAt));
+            setTextContent('modal-updated', formatFullDate(c.updatedAt || c.createdAt));
+
+            // Timeline
+            const timelineEl = document.getElementById('modal-timeline');
+            if (c.timeline && c.timeline.length > 0) {
+                timelineEl.innerHTML = '';
+                c.timeline.forEach((ev, i) => {
+                    const isLast = i === c.timeline.length - 1;
+                    const item = document.createElement('div');
+                    item.className = 'flex gap-4 pb-5';
+                    item.innerHTML = `
+                        <div class="flex flex-col items-center flex-shrink-0">
+                            <div class="w-3 h-3 rounded-full ${isLast ? 'bg-accent pulse-dot' : 'bg-surface-border'} mt-1"></div>
+                            ${!isLast ? '<div class="w-[1px] flex-grow bg-surface-border/40 mt-1"></div>' : ''}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-text-primary text-sm font-medium">${esc(ev.title || ev.event || '—')}</p>
+                            ${ev.description ? `<p class="text-text-muted text-xs mt-0.5 leading-relaxed">${esc(ev.description)}</p>` : ''}
+                            <p class="text-text-muted text-[10px] mt-1">${formatFullDate(ev.date || ev.timestamp)}</p>
+                        </div>
+                    `;
+                    timelineEl.appendChild(item);
+                });
+            } else {
+                timelineEl.innerHTML = '<p class="text-text-muted text-sm italic">No timeline events yet.</p>';
+            }
+
+            // Documents
+            const docsEl = document.getElementById('modal-documents');
+            if (c.documents && c.documents.length > 0) {
+                docsEl.innerHTML = '';
+                c.documents.forEach(d => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between bg-surface-overlay/40 border border-surface-border/30 rounded-lg px-4 py-3 hover:border-accent/20 transition duration-300 mb-2';
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3 min-w-0">
+                            <i class="fas fa-file-alt text-accent text-sm flex-shrink-0"></i>
+                            <div class="min-w-0">
+                                <p class="text-text-primary text-sm font-medium truncate">${esc(d.name || 'Document')}</p>
+                                ${d.size ? `<p class="text-text-muted text-[10px]">${esc(d.size)}</p>` : ''}
+                            </div>
+                        </div>
+                        ${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener" class="text-accent hover:text-accent-light text-xs font-medium transition duration-300 flex-shrink-0 ml-3"><i class="fas fa-download mr-1"></i>Download</a>` : ''}
+                    `;
+                    docsEl.appendChild(item);
+                });
+            } else {
+                docsEl.innerHTML = '<p class="text-text-muted text-sm italic">No documents attached.</p>';
+            }
+
+            // Admin request section
+            const adminSection = document.getElementById('modal-admin-section');
+            if (c.adminNotes) {
+                adminSection.classList.remove('hidden');
+                setTextContent('modal-admin-notes', c.adminNotes);
+
+                // Show existing reply
+                const replyWrapper = document.getElementById('modal-existing-reply-wrapper');
+                if (c.clientReply) {
+                    replyWrapper.classList.remove('hidden');
+                    setTextContent('modal-existing-reply', c.clientReply);
+                } else {
+                    replyWrapper.classList.add('hidden');
+                }
+            } else {
+                adminSection.classList.add('hidden');
+            }
+        }
+
+        // =============================================
+        //  MODAL — CLOSE
+        // =============================================
+        window.closeModal = function () {
+            const modal = document.getElementById('case-modal');
+            const panel = document.getElementById('modal-panel');
+            panel.classList.remove('open');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+                currentModalCase = null;
+                modalFiles = [];
+            }, 300);
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // =============================================
+        //  FILE UPLOAD IN MODAL
+        // =============================================
+        window.handleModalFiles = function (e) {
+            const files = Array.from(e.target.files);
+            files.forEach(f => {
+                if (f.size > 10 * 1024 * 1024) {
+                    alert(`"${f.name}" exceeds 10MB.`);
+                    return;
+                }
+                modalFiles.push(f);
+            });
+            renderModalFiles();
+            e.target.value = '';
+        };
+
+        function renderModalFiles() {
+            const container = document.getElementById('modal-files-list');
+            container.innerHTML = '';
+            modalFiles.forEach((f, i) => {
+                const el = document.createElement('div');
+                el.className = 'flex items-center justify-between bg-surface-overlay/40 border border-surface-border/30 rounded-lg px-4 py-2';
+                el.innerHTML = `
+                    <div class="flex items-center gap-2 min-w-0">
+                        <i class="fas fa-file text-accent text-xs flex-shrink-0"></i>
+                        <span class="text-text-secondary text-sm truncate">${esc(f.name)}</span>
+                        <span class="text-text-muted text-[10px] flex-shrink-0">(${(f.size / 1024).toFixed(1)}KB)</span>
+                    </div>
+                    <button onclick="removeModalFile(${i})" class="text-text-muted hover:text-red-400 transition duration-200 flex-shrink-0 ml-2">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        window.removeModalFile = function (idx) {
+            modalFiles.splice(idx, 1);
+            renderModalFiles();
+        };
+
+        // Drag and drop on modal upload zone
+        const modalUploadZone = document.getElementById('modal-upload-zone');
+        if (modalUploadZone) {
+            modalUploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                modalUploadZone.classList.add('dragover');
+            });
+            modalUploadZone.addEventListener('dragleave', () => {
+                modalUploadZone.classList.remove('dragover');
+            });
+            modalUploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                modalUploadZone.classList.remove('dragover');
+                Array.from(e.dataTransfer.files).forEach(f => {
+                    if (f.size > 10 * 1024 * 1024) { alert(`"${f.name}" exceeds 10MB.`); return; }
+                    modalFiles.push(f);
+                });
+                renderModalFiles();
+            });
+        }
+
+        // =============================================
+        //  SUBMIT REPLY
+        // =============================================
+        window.submitReply = async function () {
+            if (!currentModalCase) return;
+
+            const input = document.getElementById('modal-reply-input');
+            const message = input.value.trim();
+            const btn = document.getElementById('modal-reply-btn');
+            const statusDiv = document.getElementById('modal-reply-status');
+
+            if (!message && modalFiles.length === 0) {
+                statusDiv.classList.remove('hidden');
+                statusDiv.className = 'rounded-lg p-3 text-center text-sm font-medium mt-3 bg-red-900/30 text-red-400 border border-red-800/50';
+                statusDiv.textContent = 'Please provide a response or attach documents.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
+            statusDiv.classList.add('hidden');
+
+            try {
+                // Upload files
+                const uploadedDocs = [];
+                for (const file of modalFiles) {
+                    const fileRef = storageRef(storage, `cases/${currentModalCase.id}/${Date.now()}_${file.name}`);
+                    await uploadBytes(fileRef, file);
+                    const url = await getDownloadURL(fileRef);
+                    uploadedDocs.push({
+                        name: file.name,
+                        url,
+                        size: (file.size / 1024).toFixed(1) + 'KB',
+                        uploadedAt: new Date().toISOString()
+                    });
+                }
+
+                const caseRef = doc(db, 'artifacts', appId, 'public', 'data', 'cases', currentModalCase.id);
+                const updateData = {
+                    status: 'Pending Admin Review',
+                    lastUpdatedBy: 'client',
+                    updatedAt: serverTimestamp()
+                };
+
+                if (message) {
+                    updateData.clientReply = message;
+                    updateData.clientReplyAt = serverTimestamp();
+                }
+
+                if (uploadedDocs.length > 0) {
+                    const existing = currentModalCase.documents || [];
+                    updateData.documents = [...existing, ...uploadedDocs];
+                }
+
+                await updateDoc(caseRef, updateData);
+
+                statusDiv.classList.remove('hidden');
+                statusDiv.className = 'rounded-lg p-3 text-center text-sm font-medium mt-3 bg-green-900/30 text-green-400 border border-green-800/50';
+                statusDiv.textContent = 'Response submitted successfully!';
+                input.value = '';
+                modalFiles = [];
+                document.getElementById('modal-files-list').innerHTML = '';
+
+                setTimeout(() => closeModal(), 2000);
+
+            } catch (err) {
+                console.error('Submit error:', err);
+                statusDiv.classList.remove('hidden');
+                statusDiv.className = 'rounded-lg p-3 text-center text-sm font-medium mt-3 bg-red-900/30 text-red-400 border border-red-800/50';
+                statusDiv.textContent = 'Failed to submit. Please try again.';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Submit Response</span><i class="fas fa-paper-plane text-xs ml-2"></i>';
+            }
+        };
+
+        // =============================================
+        //  LOGOUT
+        // =============================================
+        window.handleLogout = async function () {
+            try {
+                if (unsubCases) unsubCases();
+                await signOut(auth);
+                window.location.href = './login.html';
+            } catch (err) {
+                console.error('Logout error:', err);
+            }
+        };
+
+        // =============================================
+        //  FILTER + SEARCH (exposed to window)
+        // =============================================
+        window.setFilter = function (filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.classList.add('text-text-muted');
+            });
+            const activeTab = document.querySelector(`[data-filter="${filter}"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+                activeTab.classList.remove('text-text-muted');
+            }
+            renderTable();
+        };
+
+        window.handleSearch = function (val) {
+            currentSearch = val;
+            renderTable();
+        };
+
+        window.openCaseModal = openCaseModal;
+
+        // =============================================
+        //  UTILITIES
+        // =============================================
+        function setTextContent(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        function esc(str) {
+            if (!str) return '';
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        function toDate(val) {
+            if (!val) return new Date(0);
+            if (val.toDate) return val.toDate();
+            return new Date(val);
+        }
+
+        function formatRelativeDate(val) {
+            if (!val) return '—';
+            const date = toDate(val);
+            if (isNaN(date.getTime())) return '—';
+
+            const now = new Date();
+            const diff = now - date;
+            const mins = Math.floor(diff / 60000);
+            const hrs = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (mins < 1) return 'Just now';
+            if (mins < 60) return `${mins}m ago`;
+            if (hrs < 24) return `${hrs}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatFullDate(val) {
+            if (!val) return '—';
+            const date = toDate(val);
+            if (isNaN(date.getTime())) return '—';
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+                ' at ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getStatusBadgeClass(status) {
+            const map = {
+                'Won': 'badge-won',
+                'Lost': 'badge-lost',
+                'Open': 'badge-open',
+                'New': 'badge-open',
+                'Pending Admin Review': 'badge-admin-review',
+                'In Progress': 'badge-in-progress',
+                'Under Review': 'badge-pending',
+            };
+            return map[status] || 'badge-pending';
+        }
+
+        function getPriorityColor(p) {
+            const map = { 'High': 'text-red-400', 'Medium': 'text-amber-400', 'Low': 'text-green-400' };
+            return map[p] || 'text-text-muted';
+        }
+
+        function getPriorityIcon(p) {
+            const map = { 'High': 'fas fa-arrow-up', 'Medium': 'fas fa-minus', 'Low': 'fas fa-arrow-down' };
+            return map[p] || 'fas fa-minus';
+        }
+
+        // =============================================
+        //  REVEAL OBSERVER
+        // =============================================
+        function initRevealObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { root: null, rootMargin: '0px 0px -60px 0px', threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        // Check horizontal scroll for shadow hint
+        function checkTableScroll() {
+            const container = document.getElementById('table-scroll');
+            if (!container) return;
+            if (container.scrollWidth > container.clientWidth) {
+                container.classList.add('has-scroll');
+            } else {
+                container.classList.remove('has-scroll');
+            }
+        }
+        window.addEventListener('resize', checkTableScroll);
+    </script>
+
+    <!-- ======== CURSOR GLOBE ENGINE — Identical to index.html ======== -->
+    <script>
+        // =============================================
+        //  DROPDOWN + MOBILE MENU
+        // =============================================
+        function toggleClientDropdown() {
+            const menu = document.getElementById('client-dropdown');
+            const chevron = document.getElementById('dropdown-chevron');
+            menu.classList.toggle('open');
+            chevron.style.transform = menu.classList.contains('open') ? 'rotate(180deg)' : '';
+        }
+
+        document.addEventListener('click', (e) => {
+            const trigger = document.getElementById('client-dropdown-trigger');
+            const menu = document.getElementById('client-dropdown');
+            if (trigger && menu && !trigger.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.remove('open');
+                document.getElementById('dropdown-chevron').style.transform = '';
+            }
+        });
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // =============================================
+        //  CURSOR-TRACKING GLOBE ENGINE
+        //  (Identical to index.html)
+        // =============================================
+        (function () {
+            const isTouchOnly = 'ontouchstart' in window && !window.matchMedia('(pointer: fine)').matches;
+            if (isTouchOnly) {
+                const globe = document.getElementById('cursor-globe');
+                if (globe) globe.style.display = 'none';
+                return;
+            }
+
+            const orbPrimary = document.getElementById('orb-primary');
+            const orbSecondary = document.getElementById('orb-secondary');
+            const orbTertiary = document.getElementById('orb-tertiary');
+            const gridCanvas = document.getElementById('cursor-grid-canvas');
+            const ctx = gridCanvas.getContext('2d');
+
+            let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+            let targetX = mouseX, targetY = mouseY;
+            let orbX1 = mouseX, orbY1 = mouseY;
+            let orbX2 = mouseX, orbY2 = mouseY;
+            let orbX3 = mouseX, orbY3 = mouseY;
+            let velX = 0, velY = 0;
+            let prevMouseX = mouseX, prevMouseY = mouseY;
+
+            const LERP_PRIMARY = 0.04, LERP_SECONDARY = 0.025, LERP_TERTIARY = 0.015;
+            const OFFSET_SECONDARY = 0.15, OFFSET_TERTIARY = 0.3;
+            let time = 0;
+            const BREATHE_AMP = 8, BREATHE_SPEED = 0.008;
+            const GRID_SPACING = 50, GRID_WARP_RADIUS = 250, GRID_WARP_STRENGTH = 18;
+
+            function resizeCanvas() {
+                gridCanvas.width = window.innerWidth;
+                gridCanvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            document.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; });
+
+            function lerp(c, t, f) { return c + (t - c) * f; }
+            function dist(x1, y1, x2, y2) { return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2); }
+
+            function drawGrid() {
+                ctx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+                ctx.strokeStyle = 'rgba(37, 99, 235, 0.6)';
+                ctx.lineWidth = 0.5;
+                const cols = Math.ceil(gridCanvas.width / GRID_SPACING) + 2;
+                const rows = Math.ceil(gridCanvas.height / GRID_SPACING) + 2;
+
+                for (let r = 0; r < rows; r++) {
+                    ctx.beginPath();
+                    for (let c = 0; c <= cols; c++) {
+                        let x = c * GRID_SPACING, y = r * GRID_SPACING;
+                        const d = dist(x, y, orbX1, orbY1);
+                        if (d < GRID_WARP_RADIUS) {
+                            const force = (1 - d / GRID_WARP_RADIUS);
+                            const angle = Math.atan2(y - orbY1, x - orbX1);
+                            const warp = force * force * GRID_WARP_STRENGTH;
+                            x += Math.cos(angle) * warp; y += Math.sin(angle) * warp;
+                        }
+                        c === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                }
+                for (let c = 0; c < cols; c++) {
+                    ctx.beginPath();
+                    for (let r = 0; r <= rows; r++) {
+                        let x = c * GRID_SPACING, y = r * GRID_SPACING;
+                        const d = dist(x, y, orbX1, orbY1);
+                        if (d < GRID_WARP_RADIUS) {
+                            const force = (1 - d / GRID_WARP_RADIUS);
+                            const angle = Math.atan2(y - orbY1, x - orbX1);
+                            const warp = force * force * GRID_WARP_STRENGTH;
+                            x += Math.cos(angle) * warp; y += Math.sin(angle) * warp;
+                        }
+                        r === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                }
+            }
+
+            function animate() {
+                time += BREATHE_SPEED;
+                velX = targetX - prevMouseX; velY = targetY - prevMouseY;
+                prevMouseX = targetX; prevMouseY = targetY;
+
+                const bx = Math.sin(time) * BREATHE_AMP, by = Math.cos(time * 0.7) * BREATHE_AMP * 0.6;
+                const ex = targetX + bx, ey = targetY + by;
+
+                orbX1 = lerp(orbX1, ex, LERP_PRIMARY); orbY1 = lerp(orbY1, ey, LERP_PRIMARY);
+                orbX2 = lerp(orbX2, ex + (-velX * OFFSET_SECONDARY * 8) + Math.sin(time * 1.3) * 12, LERP_SECONDARY);
+                orbY2 = lerp(orbY2, ey + (-velY * OFFSET_SECONDARY * 8) + Math.cos(time * 0.9) * 10, LERP_SECONDARY);
+                orbX3 = lerp(orbX3, ex + (-velX * OFFSET_TERTIARY * 12) + Math.cos(time * 0.6) * 20, LERP_TERTIARY);
+                orbY3 = lerp(orbY3, ey + (-velY * OFFSET_TERTIARY * 12) + Math.sin(time * 1.1) * 16, LERP_TERTIARY);
+
+                orbPrimary.style.transform = `translate3d(${orbX1 - 350}px, ${orbY1 - 350}px, 0)`;
+                orbSecondary.style.transform = `translate3d(${orbX2 - 200}px, ${orbY2 - 200}px, 0)`;
+                orbTertiary.style.transform = `translate3d(${orbX3 - 150}px, ${orbY3 - 150}px, 0)`;
+
+                const speed = Math.sqrt(velX * velX + velY * velY);
+                const dop = Math.min(1, 0.7 + speed * 0.03);
+                orbPrimary.style.opacity = dop;
+                orbSecondary.style.opacity = dop * 0.8;
+                orbTertiary.style.opacity = dop * 0.6;
+                orbPrimary.style.transform += ` scale(${1 + Math.min(speed * 0.001, 0.08)})`;
+
+                drawGrid();
+                requestAnimationFrame(animate);
+            }
+
+            requestAnimationFrame(animate);
+        })();
+    </script>
+
+</body>
+
+</html>

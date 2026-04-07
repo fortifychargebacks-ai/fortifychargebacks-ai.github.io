@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit New Chargeback Case | Fortify Chargebacks</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="../images/Logo%201.png" type="image/png">
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Tailwind Configuration (matches index.html) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        surface: {
+                            DEFAULT: '#0f1115',
+                            raised: '#161922',
+                            overlay: '#1c2030',
+                            border: '#262b3a',
+                        },
+                        accent: {
+                            DEFAULT: '#2563eb',
+                            light: '#3b82f6',
+                            muted: '#1e3a5f',
+                        },
+                        text: {
+                            primary: '#e8eaed',
+                            secondary: '#9ca3af',
+                            muted: '#6b7280',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #0f1115;
+            color: #e8eaed;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 {
+            transition-delay: 0.12s;
+        }
+
+        .reveal-delay-2 {
+            transition-delay: 0.24s;
+        }
+
+        .line-glow {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #2563eb, transparent);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #262b3a;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        .nav-blur {
+            background: rgba(15, 17, 21, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .dot-grid {
+            background-image: radial-gradient(circle, #262b3a 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Style date inputs for dark theme */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.7);
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay"
+        class="fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-300"
+        style="background-color: #0f1115;">
+        <i class="fas fa-circle-notch fa-spin text-4xl text-accent mb-4"></i>
+        <p class="text-text-secondary font-medium">Verifying Session...</p>
+    </div>
+
+    <!-- Protected App Content -->
+    <div id="protected-content" class="hidden flex-col min-h-screen">
+
+        <!-- ======== NAVIGATION ======== -->
+        <nav class="nav-blur fixed w-full z-50 border-b border-surface-border/50">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex items-center cursor-pointer" onclick="window.location.href='./dashboard.html'">
+                        <img class="h-10 w-auto mr-3" src="../images/Logo%201.png" alt="Fortify"
+                            onerror="this.style.display='none';">
+                        <div>
+                            <span class="font-bold text-lg tracking-tight text-text-primary">FORTIFY
+                                <span class="text-text-muted">PORTAL</span></span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <div
+                            class="hidden sm:flex items-center text-sm font-medium text-text-secondary bg-surface-overlay px-4 py-2 rounded-full border border-surface-border/50">
+                            <i class="fas fa-user-circle text-text-muted text-lg mr-2"></i>
+                            <span id="user-display-name">Loading...</span>
+                        </div>
+                        <button onclick="handleLogout()"
+                            class="text-text-muted hover:text-red-400 p-2 transition duration-300 rounded-lg hover:bg-red-900/20 flex items-center"
+                            title="Logout">
+                            <i class="fas fa-sign-out-alt text-lg"></i>
+                            <span class="ml-2 font-medium hidden sm:block text-sm">Logout</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ======== MAIN BODY ======== -->
+        <div class="flex-grow pt-28 pb-12 max-w-5xl mx-auto px-6 lg:px-8 w-full relative">
+            <div class="fixed inset-0 dot-grid opacity-20 pointer-events-none"></div>
+
+            <!-- Header -->
+            <div class="reveal mb-8 flex flex-col md:flex-row md:items-center justify-between relative z-10">
+                <div>
+                    <p class="text-accent text-xs font-semibold tracking-[0.3em] uppercase mb-2">New Case</p>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-text-primary">Submit New Chargeback Case</h1>
+                    <p class="text-text-secondary mt-1 text-sm">Provide accurate dispute information and upload
+                        supporting evidence.</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <button onclick="window.location.href='./dashboard.html'"
+                        class="border border-surface-border text-text-secondary hover:text-text-primary hover:border-text-muted px-5 py-2.5 rounded-xl font-medium transition duration-300 flex items-center text-sm">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                    </button>
+                </div>
+            </div>
+
+            <div class="line-glow mb-8 reveal reveal-delay-1 relative z-10"></div>
+
+            <!-- Submission Form Card -->
+            <div
+                class="reveal reveal-delay-2 bg-surface-raised border border-surface-border/50 rounded-2xl overflow-hidden relative z-10">
+
+                <form id="submit-case-form" class="p-6 sm:p-8 space-y-8">
+
+                    <!-- Success Message -->
+                    <div id="success-message"
+                        class="hidden bg-green-900/20 border border-green-800/50 rounded-xl p-4 flex items-center">
+                        <i class="fas fa-check-circle mr-3 text-2xl text-green-400"></i>
+                        <div>
+                            <h4 class="font-bold text-base text-green-400">Case Submitted Successfully!</h4>
+                            <p class="text-sm mt-0.5 text-green-400/80">Your dispute evidence has been securely
+                                uploaded. Redirecting to dashboard...</p>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="error-message"
+                        class="hidden bg-red-900/20 border border-red-800/50 rounded-xl p-4 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-3 text-xl text-red-400"></i>
+                        <span id="error-text" class="text-sm font-medium text-red-400">Please correct the errors before
+                            submitting.</span>
+                    </div>
+
+                    <!-- SECTION A: Transaction Details -->
+                    <div>
+                        <h3 class="text-lg font-bold text-accent border-b border-surface-border/50 pb-2 mb-5">Section A:
+                            Transaction Details</h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Card Network -->
+                            <div>
+                                <label class="block text-sm font-semibold text-text-secondary mb-1">Card Network <span
+                                        class="text-red-400">*</span></label>
+                                <select id="field-network" required
+                                    class="w-full px-4 py-2.5 bg-surface-overlay border border-surface-border rounded-xl focus:border-accent/50 outline-none transition duration-300 text-text-primary text-sm">
+                                    <option value="" disabled selected>Select Network...</option>
+                                    <option value="Visa">Visa</option>
+                                    <option value="Mastercard">Mastercard</option>
+                                    <option value="American Express">American Express</option>
+                                    <option value="Discover / Pulse">Discover / Pulse</option>
+                                </select>
+                            </div>
+
+                            <!-- Processor -->
+                            <div>
+                                <label class="block text-sm font-semibold text-text-secondary mb-1">Payment Processor
+                                    <span class="text-red-400">*</span></label>
+                                <select id="field-processor" required
+                                    class="w-full px-4 py-2.5 bg-surface-overlay border border-surface-border rounded-xl focus:border-accent/50 outline-none transition duration-300 text-text-primary text-sm">
+                                    <option value="" disabled selected>Select Processor...</option>
+                                    <option value="Stripe">Stripe</option>
+                                    <option value="Shopify">Shopify</option>
+                                    <option value="PayPal">PayPal</option>
+                                    <option value="Bank Acquirer">Bank Acquirer</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Reason Code -->
+                            <div>
+                                <label class="block text-sm font-semibold text-text-secondary mb-1">Reason Code <span
+                                        class="text-red-400">*</span></label>
+                                <input type="text" id="field-reason-code" required
+                                    class="w-full px-4 py-2.5 bg-surface-overlay border border-surface-border rounded-xl focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted text-sm"
+                                    placeholder="e.g. 10.4">
+                            </div>
+
+                            <!-- Dispute Amount -->
+                            <div>
+                                <label class="block text-sm font-semibold text-text-secondary mb-1">Dispute Amount <span
+                                        class="text-red-400">*</span></label>
+                                <input type="number" id="field-amount" required step="0.01" min="0.01"
+                                    class="w-full px-4 py-2.5 bg-surface-overlay border border-surface-border rounded-xl focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted text-sm"
+                                    placeholder="0.00">
+                            </div>
+
+                            <!-- Currency -->
+                            <div>
+                                <label class="block text-sm font-semibold text-text-secondary mb-1">Currency <span
+                                        class="text-red-400">*</span></label>
+                                <select id="field-currency" required
+                                    class="w-full px-4 py-2.5 bg-surface-overlay border border-surface-border rounded-xl focus:border-accent/50 outline-none transition duration-300 text-text-primary text-sm">
+                                    <option value="USD" selected>USD ($)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                    <option value="GBP">GBP (£)</option>
+                                    <option value="INR">INR (₹)</option>
+                                </select>
+                            </div>
+
+                            <!-- Order ID -->
+                            <div>
+                                <label class="block text-sm font-semibold text-text-secondary mb-1">Order ID <span
+                                        class="text-red-400">*</span></label>
+                                <input type="text" id="field-order-id" required
+                                    class="w-full px-4 py-2.5 bg-surface-overlay border border-surface-border rounded-xl focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted text-sm"
+                                    placeholder="e.g. ORD-90210">
+                            </div>
+
+                            <!-- Transaction Date -->
+                            <div>
+                                <label class="block text-sm font-semibold text-text-secondary mb-1">Transaction Date
+                                    <span class="text-red-400">*</span></label>
+                                <input type="date" id="field-tx-date" required
+                                    class="w-full px-4 py-2.5 bg-surface-overlay border border-surface-border rounded-xl focus:border-accent/50 outline-none transition duration-300 text-text-primary text-sm">
+                            </div>
+
+                            <!-- Dispute Date -->
+                            <div>
+                                <label class="block text-sm font-semibold text-text-secondary mb-1">Dispute Date <span
+                                        class="text-red-400">*</span></label>
+                                <input type="date" id="field-dispute-date" required
+                                    class="w-full px-4 py-2.5 bg-surface-overlay border border-surface-border rounded-xl focus:border-accent/50 outline-none transition duration-300 text-text-primary text-sm">
+                            </div>
+
+                            <!-- Tracking Number -->
+                            <div>
+                                <label class="block text-sm font-semibold text-text-secondary mb-1">Tracking Number
+                                    <span class="text-text-muted font-normal">(Optional)</span></label>
+                                <input type="text" id="field-tracking"
+                                    class="w-full px-4 py-2.5 bg-surface-overlay border border-surface-border rounded-xl focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted text-sm"
+                                    placeholder="Courier tracking ID">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION B: Case Description -->
+                    <div>
+                        <h3 class="text-lg font-bold text-accent border-b border-surface-border/50 pb-2 mb-5">Section B:
+                            Case Description</h3>
+                        <label class="block text-sm font-semibold text-text-secondary mb-1">Describe the transaction and
+                            why this dispute should be reversed. <span class="text-red-400">*</span></label>
+                        <textarea id="field-description" required rows="5" minlength="50"
+                            class="w-full px-4 py-3 bg-surface-overlay border border-surface-border rounded-xl focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted resize-y text-sm"
+                            placeholder="Please provide detailed context. (Minimum 50 characters)"></textarea>
+                        <p class="text-xs text-text-muted mt-1 text-right" id="char-count">0 / 50 min characters</p>
+                    </div>
+
+                    <!-- SECTION C: Evidence Upload -->
+                    <div>
+                        <h3 class="text-lg font-bold text-accent border-b border-surface-border/50 pb-2 mb-5">Section C:
+                            Evidence Upload</h3>
+
+                        <div
+                            class="border-2 border-dashed border-surface-border rounded-xl p-8 text-center bg-surface-overlay/50 hover:bg-surface-overlay hover:border-accent/30 transition duration-300 relative">
+                            <input type="file" id="field-files" multiple
+                                accept=".pdf, .png, .jpg, .jpeg, image/png, image/jpeg, application/pdf"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-text-muted mb-3"></i>
+                            <h4 class="text-text-primary font-semibold mb-1">Click or drag files here to upload</h4>
+                            <p class="text-xs text-text-muted">
+                                Accepted formats: PDF, PNG, JPG, JPEG.<br>
+                                Maximum file size: <span class="font-semibold text-text-secondary">2MB per
+                                    file</span>.<br>
+                                Maximum 5 files per case.
+                            </p>
+                        </div>
+
+                        <!-- File Preview List -->
+                        <ul id="file-preview-list" class="mt-4 space-y-2">
+                            <!-- JS injects file items here -->
+                        </ul>
+                    </div>
+
+                    <div class="line-glow"></div>
+
+                    <!-- Submit Action -->
+                    <div class="flex justify-end pt-2">
+                        <button type="submit" id="submit-btn"
+                            class="border border-accent/50 text-accent hover:bg-accent hover:text-white px-8 py-3 rounded-xl font-bold transition duration-300 flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-paper-plane mr-2"></i> Submit Case
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+
+        <!-- ======== FOOTER ======== -->
+        <footer class="border-t border-surface-border/30 py-6 mt-auto">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+                <p class="text-text-muted text-xs">&copy; 2026 Fortify Chargebacks Portal. All data is encrypted and
+                    strictly confidential.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Firebase SDKs & App Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCuWWO8g2pBQlvjNUd22R9QL0AKgp2JAGg",
+            authDomain: "fortify-chargebacks.firebaseapp.com",
+            projectId: "fortify-chargebacks",
+            storageBucket: "fortify-chargebacks.firebasestorage.app",
+            messagingSenderId: "761574321330",
+            appId: "1:761574321330:web:827dc221dd6a1b64eb6dab"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        let currentUser = null;
+        let clientProfile = {};
+        let selectedFiles = [];
+        const MAX_FILE_SIZE_MB = 2;
+        const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+        const MAX_FILES = 5;
+
+        const form = document.getElementById('submit-case-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorMsg = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const successMsg = document.getElementById('success-message');
+        const fileInput = document.getElementById('field-files');
+        const fileList = document.getElementById('file-preview-list');
+        const descInput = document.getElementById('field-description');
+        const charCount = document.getElementById('char-count');
+
+        // Route Guard & Load Profile
+        onAuthStateChanged(auth, async (user) => {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const protectedContent = document.getElementById('protected-content');
+
+            if (!user || !user.email) {
+                window.location.href = './login.html';
+                return;
+            }
+
+            currentUser = user;
+
+            try {
+                const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'clients', user.uid);
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    clientProfile = docSnap.data();
+                    document.getElementById('user-display-name').innerText = clientProfile.fullName || user.email;
+                } else {
+                    document.getElementById('user-display-name').innerText = user.email;
+                }
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+                document.getElementById('user-display-name').innerText = user.email;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('field-tx-date').max = today;
+            document.getElementById('field-dispute-date').max = today;
+
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                loadingOverlay.classList.add('hidden');
+                protectedContent.classList.remove('hidden');
+                protectedContent.classList.add('flex');
+
+                // Trigger reveal animations
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+                }, { threshold: 0.1 });
+                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            }, 300);
+        });
+
+        // Textarea Character Count
+        descInput.addEventListener('input', () => {
+            const len = descInput.value.length;
+            charCount.innerText = `${len} / 50 min characters`;
+            charCount.className = len >= 50 ? "text-xs text-green-400 mt-1 text-right" : "text-xs text-red-400 mt-1 text-right";
+        });
+
+        // File Selection & Preview
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+
+            for (const file of files) {
+                if (selectedFiles.length >= MAX_FILES) {
+                    showError(`Maximum ${MAX_FILES} files allowed per case.`);
+                    break;
+                }
+
+                if (file.size > MAX_FILE_SIZE_BYTES) {
+                    showError(`${file.name} exceeds ${MAX_FILE_SIZE_MB}MB. Please compress before uploading.`);
+                    continue;
+                }
+
+                selectedFiles.push(file);
+            }
+
+            renderFileList();
+            fileInput.value = '';
+        });
+
+        function renderFileList() {
+            fileList.innerHTML = '';
+            if (selectedFiles.length === 0) return;
+
+            selectedFiles.forEach((file, index) => {
+                const sizeKB = (file.size / 1024).toFixed(1);
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center bg-surface-overlay p-3 rounded-xl border border-surface-border/50";
+                li.innerHTML = `
+                    <div class="flex items-center overflow-hidden">
+                        <i class="fas fa-file-alt text-text-muted mr-3"></i>
+                        <span class="text-sm text-text-primary truncate">${file.name}</span>
+                        <span class="text-xs text-text-muted ml-2">(${sizeKB} KB)</span>
+                    </div>
+                    <button type="button" class="text-red-400 hover:text-red-300 px-2 remove-file-btn transition duration-300" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                fileList.appendChild(li);
+            });
+
+            document.querySelectorAll('.remove-file-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(e.currentTarget.getAttribute('data-index'));
+                    selectedFiles.splice(idx, 1);
+                    renderFileList();
+                });
+            });
+        }
+
+        // Form Submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            errorMsg.classList.add('hidden');
+
+            const amount = parseFloat(document.getElementById('field-amount').value);
+            const txDate = new Date(document.getElementById('field-tx-date').value);
+            const disputeDate = new Date(document.getElementById('field-dispute-date').value);
+            const description = document.getElementById('field-description').value.trim();
+            const now = new Date();
+
+            if (amount <= 0) { showError("Dispute amount must be greater than 0."); return; }
+            if (txDate > now) { showError("Transaction date cannot be in the future."); return; }
+            if (description.length < 50) { showError("Description must be at least 50 characters."); return; }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Processing...';
+
+            try {
+                const casesCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'cases');
+                const newCaseRef = doc(casesCollectionRef);
+                const caseId = newCaseRef.id;
+
+                if (selectedFiles.length > MAX_FILES) {
+                    showError(`Maximum ${MAX_FILES} files allowed.`);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Submit Case';
+                    return;
+                }
+
+                for (const file of selectedFiles) {
+                    if (file.size > MAX_FILE_SIZE_BYTES) {
+                        showError(`${file.name} exceeds ${MAX_FILE_SIZE_MB}MB limit.`);
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Submit Case';
+                        return;
+                    }
+                }
+
+                // Generate auto case number (FC-00001)
+                submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Generating Case Number...';
+                const counterRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'caseCounter');
+                let caseNumber;
+                try {
+                    caseNumber = await runTransaction(db, async (transaction) => {
+                        const counterSnap = await transaction.get(counterRef);
+                        let nextNum = 1;
+                        if (counterSnap.exists()) {
+                            nextNum = (counterSnap.data().nextNumber || 1);
+                        }
+                        transaction.set(counterRef, { nextNumber: nextNum + 1 }, { merge: true });
+                        return 'FC-' + String(nextNum).padStart(5, '0');
+                    });
+                } catch (counterErr) {
+                    console.warn('Counter transaction failed, using timestamp fallback:', counterErr);
+                    caseNumber = 'FC-' + Date.now().toString().slice(-5);
+                }
+
+                const evidenceFilesUrls = [];
+                if (selectedFiles.length > 0) {
+                    submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Uploading Files...';
+
+                    for (const file of selectedFiles) {
+                        const filePath = `artifacts/${appId}/public/data/case-files/${currentUser.uid}/${caseId}/${file.name}`;
+                        const storageRef = ref(storage, filePath);
+
+                        await uploadBytes(storageRef, file);
+                        const downloadUrl = await getDownloadURL(storageRef);
+                        evidenceFilesUrls.push(downloadUrl);
+                    }
+                }
+
+                submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Saving Case...';
+
+                const orderId = document.getElementById('field-order-id').value.trim();
+                const casePayload = {
+                    caseId: caseId,
+                    caseNumber: caseNumber,
+                    clientId: currentUser.uid,
+                    title: orderId + ' - ' + document.getElementById('field-network').value + ' Dispute',
+                    clientName: clientProfile.fullName || currentUser.email,
+                    clientEmail: currentUser.email,
+                    businessName: clientProfile.businessName || "N/A",
+                    network: document.getElementById('field-network').value,
+                    processor: document.getElementById('field-processor').value,
+                    reasonCode: document.getElementById('field-reason-code').value.trim(),
+                    amount: amount,
+                    currency: document.getElementById('field-currency').value,
+                    transactionDate: document.getElementById('field-tx-date').value,
+                    disputeDate: document.getElementById('field-dispute-date').value,
+                    orderId: orderId,
+                    transactionId: orderId,
+                    trackingNumber: document.getElementById('field-tracking').value.trim() || null,
+                    description: description,
+                    evidenceFiles: [],
+                    status: "Open",
+                    createdAt: serverTimestamp()
+                };
+
+                await setDoc(newCaseRef, casePayload);
+
+                successMsg.classList.remove('hidden');
+                form.reset();
+                selectedFiles = [];
+                renderFileList();
+
+                setTimeout(() => {
+                    window.location.href = './dashboard.html';
+                }, 1500);
+
+            } catch (err) {
+                console.error("Submission error:", err);
+                showError("An error occurred while submitting your case. Please try again.");
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Submit Case';
+            }
+        });
+
+        function showError(msg) {
+            errorText.innerText = msg;
+            errorMsg.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Logout Handler
+        window.handleLogout = async function () {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error("Logout failed", error);
+            }
+        };
+    </script>
+
+</body>
+
+</html>

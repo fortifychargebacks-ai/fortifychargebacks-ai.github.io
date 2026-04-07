@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Registration | Fortify Chargebacks</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="../images/Logo%201.png" type="image/png">
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Tailwind Configuration (matches index.html) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        surface: {
+                            DEFAULT: '#0f1115',
+                            raised: '#161922',
+                            overlay: '#1c2030',
+                            border: '#262b3a',
+                        },
+                        accent: {
+                            DEFAULT: '#2563eb',
+                            light: '#3b82f6',
+                            muted: '#1e3a5f',
+                        },
+                        text: {
+                            primary: '#e8eaed',
+                            secondary: '#9ca3af',
+                            muted: '#6b7280',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #0f1115;
+            color: #e8eaed;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 {
+            transition-delay: 0.12s;
+        }
+
+        .reveal-delay-2 {
+            transition-delay: 0.24s;
+        }
+
+        .line-glow {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #2563eb, transparent);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #262b3a;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        .nav-blur {
+            background: rgba(15, 17, 21, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .dot-grid {
+            background-image: radial-gradient(circle, #262b3a 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        input:focus,
+        select:focus {
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- ======== NAVIGATION ======== -->
+    <nav class="nav-blur fixed w-full z-50 border-b border-surface-border/50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center cursor-pointer" onclick="window.location.href='../index.html'">
+                    <img class="h-10 w-auto mr-3" src="../images/Logo%201.png" alt="Fortify"
+                        onerror="this.style.display='none';">
+                    <div>
+                        <span class="font-bold text-lg tracking-tight text-text-primary">FORTIFY
+                            <span class="text-text-muted">CHARGEBACKS</span></span>
+                        <p class="text-[10px] text-text-muted tracking-wide hidden lg:block">From Dispute to Victory –
+                            We Fortify Your Revenue</p>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="../index.html"
+                        class="text-text-secondary hover:text-text-primary text-sm font-medium transition duration-300">Back
+                        to Home</a>
+                    <a href="./login.html"
+                        class="text-accent border border-accent/40 hover:bg-accent hover:text-white px-5 py-2 rounded-full text-sm font-medium transition duration-300">
+                        Login
+                    </a>
+                </div>
+
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-text-secondary hover:text-text-primary p-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-surface border-t border-surface-border">
+            <div class="px-6 py-6 space-y-1">
+                <a href="../index.html"
+                    class="block py-3 text-text-secondary hover:text-text-primary text-sm font-medium border-b border-surface-border/50">Back
+                    to Home</a>
+                <a href="./login.html"
+                    class="block mt-4 text-center py-3 border border-accent/40 text-accent rounded-lg text-sm font-semibold">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======== MAIN REGISTRATION SECTION ======== -->
+    <div class="flex-grow flex items-center justify-center pt-28 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="absolute inset-0 dot-grid opacity-30"></div>
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px]">
+        </div>
+
+        <!-- Registration Card -->
+        <div
+            class="reveal max-w-2xl w-full bg-surface-raised border border-surface-border/50 rounded-2xl shadow-2xl p-8 sm:p-10 z-10 relative">
+
+            <div
+                class="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent">
+            </div>
+
+            <div class="text-center mb-8">
+                <div
+                    class="inline-flex items-center justify-center w-14 h-14 border border-accent/30 rounded-xl mb-5 bg-accent/5">
+                    <i class="fas fa-building text-accent text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-text-primary">Client Portal Registration</h2>
+                <p class="text-sm text-text-secondary mt-2">Create your secure client account to submit and track
+                    disputes.</p>
+            </div>
+
+            <div class="line-glow mb-8"></div>
+
+            <!-- Error Message Box -->
+            <div id="error-box"
+                class="hidden bg-red-900/20 border border-red-800/50 p-4 rounded-xl mb-6 transition-all duration-300">
+                <div class="flex">
+                    <div class="flex-shrink-0"><i class="fas fa-exclamation-circle text-red-400"></i></div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-400 font-medium" id="error-message">Please correct the errors before
+                            proceeding.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registration Form -->
+            <form id="registerForm" class="space-y-5" onsubmit="handleRegister(event)">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-text-secondary mb-2">Full Name <span
+                                class="text-red-400">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-text-muted text-sm"></i>
+                            </div>
+                            <input type="text" id="fullName" required
+                                class="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-overlay border border-surface-border focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted text-sm"
+                                placeholder="John Doe">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="businessName" class="block text-sm font-medium text-text-secondary mb-2">Business
+                            Name <span class="text-red-400">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fas fa-briefcase text-text-muted text-sm"></i>
+                            </div>
+                            <input type="text" id="businessName" required
+                                class="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-overlay border border-surface-border focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted text-sm"
+                                placeholder="Acme Corp">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-text-secondary mb-2">Business Email
+                            <span class="text-red-400">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-text-muted text-sm"></i>
+                            </div>
+                            <input type="email" id="email" required
+                                class="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-overlay border border-surface-border focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted text-sm"
+                                placeholder="john@acmecorp.com">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-text-secondary mb-2">Phone
+                            Number</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fas fa-phone text-text-muted text-sm"></i>
+                            </div>
+                            <input type="tel" id="phone"
+                                class="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-overlay border border-surface-border focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted text-sm"
+                                placeholder="+1 (555) 000-0000">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-text-secondary mb-2">Password <span
+                                class="text-red-400">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-text-muted text-sm"></i>
+                            </div>
+                            <input type="password" id="password" required minlength="8"
+                                class="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-overlay border border-surface-border focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted text-sm"
+                                placeholder="Min. 8 characters">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-text-secondary mb-2">Confirm
+                            Password <span class="text-red-400">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fas fa-check-circle text-text-muted text-sm"></i>
+                            </div>
+                            <input type="password" id="confirmPassword" required
+                                class="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-overlay border border-surface-border focus:border-accent/50 outline-none transition duration-300 text-text-primary placeholder-text-muted text-sm"
+                                placeholder="Re-enter password">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" id="registerBtn"
+                        class="w-full border border-accent/50 text-accent hover:bg-accent hover:text-white font-semibold py-3.5 rounded-xl transition duration-300 flex justify-center items-center text-sm">
+                        <span id="btn-text">Create Account</span>
+                        <i id="btn-icon" class="fas fa-user-plus ml-2 text-xs"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-surface-border/50 text-center">
+                <p class="text-sm text-text-muted">
+                    Already have an account?
+                    <a href="./login.html"
+                        class="text-accent font-semibold hover:text-accent-light transition duration-300">Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== FOOTER ======== -->
+    <footer class="border-t border-surface-border/30 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-text-muted text-xs">&copy; 2026 Fortify Chargebacks. All rights reserved.</p>
+                <div class="mt-4 md:mt-0 flex gap-6">
+                    <a href="../index.html"
+                        class="text-text-muted hover:text-text-primary text-xs transition duration-300">Return to Main
+                        Site</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDKs & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCuWWO8g2pBQlvjNUd22R9QL0AKgp2JAGg",
+            authDomain: "fortify-chargebacks.firebaseapp.com",
+            projectId: "fortify-chargebacks",
+            storageBucket: "fortify-chargebacks.firebasestorage.app",
+            messagingSenderId: "761574321330",
+            appId: "1:761574321330:web:827dc221dd6a1b64eb6dab"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        function showError(message) {
+            const errorBox = document.getElementById('error-box');
+            const errorMsg = document.getElementById('error-message');
+            errorBox.classList.remove('hidden');
+            errorMsg.innerText = message;
+            errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function hideError() {
+            document.getElementById('error-box').classList.add('hidden');
+        }
+
+        window.handleRegister = async function (event) {
+            event.preventDefault();
+            hideError();
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const businessName = document.getElementById('businessName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password.length < 8) {
+                return showError("Password must be at least 8 characters long.");
+            }
+            if (password !== confirmPassword) {
+                return showError("Passwords do not match. Please try again.");
+            }
+
+            const btn = document.getElementById('registerBtn');
+            const btnText = document.getElementById('btn-text');
+            const btnIcon = document.getElementById('btn-icon');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-60', 'cursor-not-allowed');
+            btnText.innerText = 'Creating Account...';
+            btnIcon.className = 'fas fa-spinner fa-spin ml-2 text-xs';
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'clients', user.uid);
+
+                await setDoc(userDocRef, {
+                    uid: user.uid,
+                    fullName: fullName,
+                    businessName: businessName,
+                    email: email,
+                    phone: phone,
+                    role: "client",
+                    createdAt: serverTimestamp()
+                });
+
+                btn.classList.remove('border-accent/50', 'text-accent', 'hover:bg-accent');
+                btn.classList.add('bg-green-600/20', 'border-green-600/50', 'text-green-400');
+                btnText.innerText = 'Account Created!';
+                btnIcon.className = 'fas fa-check ml-2 text-xs';
+
+                setTimeout(() => { window.location.href = './dashboard.html'; }, 1000);
+
+            } catch (error) {
+                console.error("Registration error:", error);
+
+                btn.disabled = false;
+                btn.classList.remove('opacity-60', 'cursor-not-allowed');
+                btnText.innerText = 'Create Account';
+                btnIcon.className = 'fas fa-user-plus ml-2 text-xs';
+
+                if (error.code === 'auth/email-already-in-use') {
+                    showError("This email is already registered. Please log in instead.");
+                } else if (error.code === 'auth/invalid-email') {
+                    showError("The email address is invalid.");
+                } else if (error.code === 'auth/weak-password') {
+                    showError("The password provided is too weak.");
+                } else {
+                    showError("An error occurred during registration: " + error.message);
+                }
+            }
+        };
+    </script>
+
+    <!-- UI Logic -->
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileBtn && mobileMenu) {
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const icon = mobileBtn.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            });
+        }
+    </script>
+
+</body>
+
+</html>

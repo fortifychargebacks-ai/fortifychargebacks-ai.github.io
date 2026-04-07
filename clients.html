@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Accounts - Fortify Chargebacks</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="../public/images/Logo%201.png" type="image/png">
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind Config (Identical to dashboard) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        surface: { DEFAULT: '#0f1115', raised: '#161922', overlay: '#1c2030', border: '#262b3a' },
+                        accent: { DEFAULT: '#2563eb', light: '#3b82f6', muted: '#1e3a5f' },
+                        text: { primary: '#e8eaed', secondary: '#9ca3af', muted: '#6b7280' }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #0f1115;
+            color: #e8eaed;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #262b3a;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #262b3a;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        .nav-blur {
+            background: rgba(15, 17, 21, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased h-screen overflow-hidden" style="background-color:#0f1115; color:#e8eaed;">
+
+    <!-- ====================================================================== -->
+    <!-- LOADING SCREEN                                                         -->
+    <!-- ====================================================================== -->
+    <div id="loading-screen" class="fixed inset-0 z-50 bg-surface-raised flex flex-col items-center justify-center">
+        <i class="fas fa-shield-alt text-5xl text-accent mb-4 animate-pulse"></i>
+        <h2 class="text-xl font-bold text-accent-light mb-2">Verifying Credentials</h2>
+        <p class="text-text-muted text-sm flex items-center">
+            <i class="fas fa-circle-notch fa-spin mr-2"></i> Connecting to secure server...
+        </p>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- DASHBOARD UI                                                           -->
+    <!-- ====================================================================== -->
+    <div id="dashboard-ui" class="hidden h-full flex w-full">
+
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-surface-raised text-white flex flex-col transition-all duration-300 z-20 hidden md:flex">
+            <div class="h-20 flex items-center justify-center border-b border-surface-border px-4">
+                <img class="h-10 w-auto mr-3" src="../public/images/Logo%202.png" alt="Logo"
+                    onerror="this.style.display='none'">
+                <span class="font-bold text-lg tracking-tight text-text-primary">FORTIFY</span>
+            </div>
+            <nav class="flex-1 overflow-y-auto custom-scrollbar py-6 space-y-2 px-3">
+                <a href="dashboard.html"
+                    class="flex items-center px-4 py-3 text-text-secondary hover:bg-accent/50 hover:text-white rounded-lg transition">
+                    <i class="fas fa-chart-pie w-6"></i><span class="font-medium">Dashboard</span>
+                </a>
+                <a href="clients.html" class="flex items-center px-4 py-3 bg-accent text-white rounded-lg transition">
+                    <i class="fas fa-users w-6"></i><span class="font-medium">Client Accounts</span>
+                </a>
+                <a href="cases.html"
+                    class="flex items-center px-4 py-3 text-text-secondary hover:bg-accent/50 hover:text-white rounded-lg transition">
+                    <i class="fas fa-file-invoice-dollar w-6"></i><span class="font-medium">Submitted Cases</span>
+                </a>
+                <a href="inquiries.html"
+                    class="flex items-center px-4 py-3 text-text-secondary hover:bg-accent/50 hover:text-white rounded-lg transition">
+                    <i class="fas fa-envelope w-6"></i><span class="font-medium">Contact Inquiries</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-surface-border">
+                <button onclick="handleLogout()"
+                    class="w-full flex items-center px-4 py-2 text-text-secondary hover:text-red-400 hover:bg-red-400/10 rounded-lg transition">
+                    <i class="fas fa-sign-out-alt w-6"></i><span class="font-medium">Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 flex flex-col h-full bg-surface-overlay overflow-hidden relative">
+
+            <!-- TOP NAVBAR -->
+            <header
+                class="h-20 bg-surface-raised flex items-center justify-between px-6 lg:px-10 z-10 border-b border-surface-border">
+                <div class="flex items-center">
+                    <button id="mobile-menu-btn" class="md:hidden text-text-muted hover:text-accent mr-4">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-xl font-bold text-text-primary">Client Accounts</h1>
+                        <p class="text-xs text-text-muted leading-tight">Manage registered clients and account status
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="hidden sm:flex items-center">
+                        <span
+                            class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-bold border border-accent/20 flex items-center">
+                            <i class="fas fa-shield-alt mr-1.5"></i> Admin
+                        </span>
+                    </div>
+                    <div class="h-8 w-px bg-surface-border mx-2 hidden sm:block"></div>
+                    <div class="flex items-center space-x-3 cursor-pointer">
+                        <div
+                            class="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center border border-surface-border text-accent font-bold">
+                            A</div>
+                        <div class="hidden md:block text-sm">
+                            <p class="font-bold text-text-primary leading-tight" id="admin-email-display">Loading...</p>
+                            <p class="text-xs text-text-muted">System Administrator</p>
+                        </div>
+                    </div>
+                    <button onclick="handleLogout()" class="md:hidden text-text-muted hover:text-red-400 ml-2">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- SCROLLABLE CONTENT -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10">
+
+                <!-- SUMMARY CARDS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-accent/10 flex items-center justify-center text-accent mr-4">
+                            <i class="fas fa-users text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">Total Clients</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-total">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-green-900/20 flex items-center justify-center text-green-400 mr-4">
+                            <i class="fas fa-user-check text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">Active Clients</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-active">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div class="w-14 h-14 rounded-lg bg-red-900/20 flex items-center justify-center text-red-600 mr-4">
+                            <i class="fas fa-user-slash text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">Suspended</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-suspended">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-indigo-900/20 flex items-center justify-center text-indigo-400 mr-4">
+                            <i class="fas fa-briefcase text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">With Active Cases</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-withcases">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEARCH & FILTER BAR -->
+                <div class="bg-surface-raised rounded-2xl border border-surface-border overflow-hidden mb-6">
+                    <div class="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <!-- Search -->
+                        <div class="relative flex-1 max-w-md">
+                            <i
+                                class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm"></i>
+                            <input type="text" id="search-input" placeholder="Search by name or email..."
+                                class="w-full pl-10 pr-4 py-2.5 border border-surface-border rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition">
+                        </div>
+                        <!-- Filters -->
+                        <div class="flex items-center space-x-3 flex-wrap gap-y-2">
+                            <select id="filter-status"
+                                class="px-3 py-2.5 border border-surface-border rounded-lg text-sm text-text-secondary bg-surface-raised focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition">
+                                <option value="all">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="Suspended">Suspended</option>
+                                <option value="Under Review">Under Review</option>
+                            </select>
+                            <select id="filter-date"
+                                class="px-3 py-2.5 border border-surface-border rounded-lg text-sm text-text-secondary bg-surface-raised focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition">
+                                <option value="all">All Dates</option>
+                                <option value="7">Last 7 Days</option>
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                                <option value="365">Last Year</option>
+                            </select>
+                            <button onclick="clearFilters()"
+                                class="px-3 py-2.5 text-xs font-bold text-text-muted border border-surface-border rounded-lg hover:bg-surface-overlay transition">
+                                <i class="fas fa-times mr-1"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLIENTS TABLE -->
+                <div class="bg-surface-raised rounded-2xl border border-surface-border overflow-hidden">
+                    <div class="px-6 py-5 border-b border-surface-border flex justify-between items-center ">
+                        <h2 class="text-lg font-bold text-text-primary">All Clients</h2>
+                        <p class="text-xs text-text-muted font-medium" id="results-count">0 results</p>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left text-sm text-text-secondary">
+                            <thead class="bg-surface-overlay text-xs text-text-muted uppercase font-semibold">
+                                <tr>
+                                    <th class="px-6 py-4">Client ID</th>
+                                    <th class="px-6 py-4">Full Name</th>
+                                    <th class="px-6 py-4">Email Address</th>
+                                    <th class="px-6 py-4">Phone</th>
+                                    <th class="px-6 py-4">Registered</th>
+                                    <th class="px-6 py-4 text-center">Total Cases</th>
+                                    <th class="px-6 py-4 text-center">Active</th>
+                                    <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-table-body" class="divide-y divide-surface-border">
+                                <tr>
+                                    <td colspan="9" class="px-6 py-12 text-center text-text-muted">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i> Loading clients...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- PAGINATION -->
+                    <div
+                        class="px-6 py-4 border-t border-surface-border flex flex-col sm:flex-row items-center justify-between gap-3 ">
+                        <p class="text-xs text-text-muted" id="pagination-info">Showing 0 of 0</p>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="prevPage()" id="btn-prev" disabled
+                                class="px-3 py-1.5 text-xs font-bold border border-surface-border rounded-lg text-text-muted bg-surface-raised disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-overlay transition">
+                                <i class="fas fa-chevron-left mr-1"></i> Previous
+                            </button>
+                            <span class="text-xs font-bold text-text-secondary" id="page-indicator">1</span>
+                            <button onclick="nextPage()" id="btn-next" disabled
+                                class="px-3 py-1.5 text-xs font-bold border border-surface-border rounded-lg text-text-muted bg-surface-raised disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-overlay transition">
+                                Next <i class="fas fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-10 hidden md:hidden"></div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- VIEW PROFILE MODAL                                                     -->
+    <!-- ====================================================================== -->
+    <div id="view-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop bg-black/60">
+        <div
+            class="bg-surface-raised rounded-2xl  w-full max-w-4xl mx-4 max-h-[92vh] flex flex-col overflow-hidden border border-surface-border">
+            <!-- Header -->
+            <div class="px-6 py-5 border-b border-surface-border flex justify-between items-center  shrink-0">
+                <h3 class="text-lg font-bold text-text-primary flex items-center">
+                    <i class="fas fa-user-circle mr-2 text-accent"></i> Client Profile
+                </h3>
+                <button onclick="closeViewModal()" class="text-text-muted hover:text-text-secondary transition">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+
+                <!-- Client Details Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Client ID</label>
+                        <p class="text-sm font-mono text-accent mt-1" id="m-clientId">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Full Name</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="m-fullName">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Email
+                            Address</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="m-email">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Phone
+                            Number</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="m-phone">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Registration
+                            Date</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="m-date">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Account
+                            Status</label>
+                        <p class="mt-1" id="m-status">—</p>
+                    </div>
+                </div>
+
+                <!-- Case Summary -->
+                <div>
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Case Summary</label>
+                    <div class="grid grid-cols-3 gap-4 mt-2">
+                        <div class="p-4 bg-accent/10 rounded-lg border border-accent/30 text-center">
+                            <p class="text-2xl font-bold text-accent" id="m-totalCases">0</p>
+                            <p class="text-xs font-medium text-text-muted mt-1">Total</p>
+                        </div>
+                        <div class="p-4 bg-yellow-900/20 rounded-lg border border-yellow-800/30 text-center">
+                            <p class="text-2xl font-bold text-yellow-400" id="m-pendingCases">0</p>
+                            <p class="text-xs font-medium text-text-muted mt-1">Pending</p>
+                        </div>
+                        <div class="p-4 bg-green-900/20 rounded-lg border border-green-800/30 text-center">
+                            <p class="text-2xl font-bold text-green-400" id="m-closedCases">0</p>
+                            <p class="text-xs font-medium text-text-muted mt-1">Closed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Cases List -->
+                <div>
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Client Cases</label>
+                    <div class="mt-2 border border-surface-border rounded-lg divide-y divide-surface-border max-h-48 overflow-y-auto custom-scrollbar"
+                        id="m-casesList">
+                        <p class="px-4 py-3 text-sm text-text-muted">No cases associated.</p>
+                    </div>
+                </div>
+
+                <!-- Account Status Control -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Update Account
+                            Status</label>
+                        <select id="m-statusSelect"
+                            class="mt-2 w-full px-4 py-3 border border-surface-border rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition bg-surface-raised">
+                            <option value="Active">Active</option>
+                            <option value="Suspended">Suspended</option>
+                            <option value="Under Review">Under Review</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="triggerResetPassword()"
+                            class="w-full px-4 py-3 text-sm font-bold text-orange-400 bg-orange-900/20 border border-orange-800/40 rounded-lg hover:bg-orange-900/30 transition flex items-center justify-center">
+                            <i class="fas fa-key mr-2"></i> Send Password Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Internal Admin Notes -->
+                <div>
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Internal Admin
+                        Notes</label>
+                    <div class="mt-2 border border-surface-border rounded-lg divide-y divide-surface-border max-h-40 overflow-y-auto custom-scrollbar"
+                        id="m-notes">
+                        <p class="px-4 py-3 text-sm text-text-muted">No notes recorded.</p>
+                    </div>
+                    <textarea id="m-newNote" rows="2" placeholder="Add an internal note..."
+                        class="mt-3 w-full px-4 py-3 border border-surface-border rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition resize-none"></textarea>
+                    <button onclick="addNote()"
+                        class="mt-2 px-4 py-2 text-xs font-bold text-accent bg-accent/10 border border-accent/20 rounded-lg hover:bg-blue-100 transition">
+                        <i class="fas fa-plus mr-1"></i> Add Note
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 border-t border-surface-border  flex flex-col sm:flex-row justify-end gap-3 shrink-0">
+                <button onclick="closeViewModal()"
+                    class="px-4 py-2.5 text-sm font-medium text-text-secondary bg-surface-raised border border-surface-border rounded-lg hover:bg-surface-overlay transition">
+                    Cancel
+                </button>
+                <button onclick="saveProfileChanges()"
+                    class="px-5 py-2.5 text-sm font-bold text-white bg-accent rounded-lg hover:bg-surface-raised transition flex items-center justify-center">
+                    <i class="fas fa-save mr-2"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- DELETE CONFIRMATION MODAL                                              -->
+    <!-- ====================================================================== -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop bg-black/60">
+        <div class="bg-surface-raised rounded-2xl  w-full max-w-md mx-4 overflow-hidden border border-surface-border">
+            <div class="px-6 py-5 border-b border-surface-border bg-red-900/20/50">
+                <h3 class="text-lg font-bold text-red-400 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Confirm Account Deletion
+                </h3>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-text-secondary">Are you sure you want to permanently delete this client account?
+                    All
+                    associated data will be removed. This action cannot be undone.</p>
+                <div class="mt-4 p-3 bg-surface-overlay rounded-lg border border-surface-border">
+                    <p class="text-xs text-text-muted">Client</p>
+                    <p class="text-sm font-medium text-text-primary" id="delete-modal-name">—</p>
+                    <p class="text-xs font-mono text-accent mt-1" id="delete-modal-id">—</p>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-surface-border  flex justify-end gap-3">
+                <button onclick="closeDeleteModal()"
+                    class="px-4 py-2.5 text-sm font-medium text-text-secondary bg-surface-raised border border-surface-border rounded-lg hover:bg-surface-overlay transition">Cancel</button>
+                <button onclick="confirmDelete()"
+                    class="px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 transition flex items-center justify-center">
+                    <i class="fas fa-trash-alt mr-2"></i> Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- TOAST                                                                  -->
+    <!-- ====================================================================== -->
+    <div id="toast"
+        class="fixed bottom-6 right-6 z-50 hidden transform transition-all duration-300 translate-y-4 opacity-0">
+        <div class="flex items-center px-5 py-3 rounded-xl shadow-lg border text-sm font-medium" id="toast-inner">
+            <i class="mr-2" id="toast-icon"></i>
+            <span id="toast-message"></span>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- FIREBASE & PAGE LOGIC                                                  -->
+    <!-- ====================================================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore, doc, getDoc, collection, onSnapshot,
+            updateDoc, deleteDoc, serverTimestamp, query, orderBy, arrayUnion
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCuWWO8g2pBQlvjNUd22R9QL0AKgp2JAGg",
+            authDomain: "fortify-chargebacks.firebaseapp.com",
+            projectId: "fortify-chargebacks",
+            storageBucket: "fortify-chargebacks.firebasestorage.app",
+            messagingSenderId: "761574321330",
+            appId: "1:761574321330:web:827dc221dd6a1b64eb6dab"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // =====================================================================
+        // STATE
+        // =====================================================================
+        let allClients = [];
+        let allCases = [];
+        let filteredClients = [];
+        let currentPage = 1;
+        const PAGE_SIZE = 10;
+        let currentViewId = null;
+        let currentDeleteId = null;
+        let adminEmail = 'Admin';
+
+        // =====================================================================
+        // AUTH
+        // =====================================================================
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+            try {
+                const adminDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'admins', user.uid);
+                const adminDocSnap = await getDoc(adminDocRef);
+                if (!adminDocSnap.exists() || adminDocSnap.data().role !== 'admin') {
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                } else {
+                    adminEmail = user.email || 'Admin';
+                    document.getElementById('admin-email-display').innerText = adminEmail;
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('dashboard-ui').classList.remove('hidden');
+                    listenToData();
+                }
+            } catch (error) {
+                console.error("Auth error:", error);
+                await signOut(auth);
+                window.location.href = 'login.html';
+            }
+        });
+
+        window.handleLogout = async function () {
+            try { await signOut(auth); window.location.href = 'login.html'; }
+            catch (e) { console.error("Logout error:", e); }
+        };
+
+        // =====================================================================
+        // REAL-TIME LISTENERS
+        // =====================================================================
+        function listenToData() {
+            // Clients
+            const clientsRef = collection(db, 'artifacts', appId, 'public', 'data', 'clients');
+            const cQ = query(clientsRef, orderBy('createdAt', 'desc'));
+
+            onSnapshot(cQ, (snap) => {
+                allClients = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                applyFilters();
+            }, () => {
+                onSnapshot(clientsRef, (snap) => {
+                    allClients = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    allClients.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+                    applyFilters();
+                });
+            });
+
+            // Cases (for cross-reference)
+            const casesRef = collection(db, 'artifacts', appId, 'public', 'data', 'cases');
+            onSnapshot(casesRef, (snap) => {
+                allCases = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                applyFilters();
+            });
+        }
+
+        // =====================================================================
+        // SEARCH & FILTER
+        // =====================================================================
+        document.getElementById('search-input').addEventListener('input', () => { currentPage = 1; applyFilters(); });
+        document.getElementById('filter-status').addEventListener('change', () => { currentPage = 1; applyFilters(); });
+        document.getElementById('filter-date').addEventListener('change', () => { currentPage = 1; applyFilters(); });
+
+        window.clearFilters = function () {
+            document.getElementById('search-input').value = '';
+            document.getElementById('filter-status').value = 'all';
+            document.getElementById('filter-date').value = 'all';
+            currentPage = 1;
+            applyFilters();
+        };
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('filter-status').value;
+            const dateFilter = document.getElementById('filter-date').value;
+            const now = Date.now();
+
+            filteredClients = allClients.filter(c => {
+                // Search
+                if (searchTerm) {
+                    const name = (c.fullName || '').toLowerCase();
+                    const email = (c.email || '').toLowerCase();
+                    if (!name.includes(searchTerm) && !email.includes(searchTerm)) return false;
+                }
+
+                // Status
+                if (statusFilter !== 'all') {
+                    if ((c.status || 'Active') !== statusFilter) return false;
+                }
+
+                // Date
+                if (dateFilter !== 'all') {
+                    const days = parseInt(dateFilter);
+                    const created = c.createdAt?.toMillis?.() || (c.createdAt ? new Date(c.createdAt).getTime() : 0);
+                    if (now - created > days * 86400000) return false;
+                }
+
+                return true;
+            });
+
+            // Enrich with case counts
+            filteredClients = filteredClients.map(c => {
+                const clientCases = allCases.filter(cs => cs.clientId === c.id || cs.clientId === c.clientId);
+                return {
+                    ...c,
+                    _totalCases: c.totalCases || clientCases.length,
+                    _activeCases: c.activeCases || clientCases.filter(cs => cs.status !== 'Resolved' && cs.status !== 'Rejected').length
+                };
+            });
+
+            updateStats();
+            renderTable();
+        }
+
+        // =====================================================================
+        // STATS
+        // =====================================================================
+        function updateStats() {
+            const total = allClients.length;
+            const active = allClients.filter(c => (c.status || 'Active') === 'Active').length;
+            const suspended = allClients.filter(c => c.status === 'Suspended').length;
+
+            const clientsWithCases = allClients.filter(c => {
+                const cases = allCases.filter(cs => cs.clientId === c.id || cs.clientId === c.clientId);
+                const actCount = c.activeCases || cases.filter(cs => cs.status !== 'Resolved' && cs.status !== 'Rejected').length;
+                return actCount > 0;
+            }).length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-active').innerText = active;
+            document.getElementById('stat-suspended').innerText = suspended;
+            document.getElementById('stat-withcases').innerText = clientsWithCases;
+        }
+
+        // =====================================================================
+        // RENDER TABLE WITH PAGINATION
+        // =====================================================================
+        function renderTable() {
+            const tbody = document.getElementById('clients-table-body');
+            const totalPages = Math.ceil(filteredClients.length / PAGE_SIZE) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const pageClients = filteredClients.slice(start, start + PAGE_SIZE);
+
+            document.getElementById('results-count').innerText = `${filteredClients.length} result${filteredClients.length !== 1 ? 's' : ''}`;
+            document.getElementById('pagination-info').innerText = filteredClients.length === 0
+                ? 'Showing 0 of 0'
+                : `Showing ${start + 1}–${Math.min(start + PAGE_SIZE, filteredClients.length)} of ${filteredClients.length}`;
+            document.getElementById('page-indicator').innerText = `${currentPage} / ${totalPages}`;
+
+            const prevBtn = document.getElementById('btn-prev');
+            const nextBtn = document.getElementById('btn-next');
+            prevBtn.disabled = currentPage <= 1;
+            nextBtn.disabled = currentPage >= totalPages;
+            prevBtn.classList.toggle('text-accent', currentPage > 1);
+            prevBtn.classList.toggle('text-text-muted', currentPage <= 1);
+            nextBtn.classList.toggle('text-accent', currentPage < totalPages);
+            nextBtn.classList.toggle('text-text-muted', currentPage >= totalPages);
+
+            if (filteredClients.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="px-6 py-16 text-center">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-users text-4xl text-text-secondary mb-3"></i>
+                            <p class="text-text-muted font-medium">No client accounts found.</p>
+                            <p class="text-text-muted text-xs mt-1">Registered clients will appear here.</p>
+                        </div>
+                    </td>
+                </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = pageClients.map(c => {
+                const status = c.status || 'Active';
+                return `
+            <tr class="hover:bg-surface-overlay transition">
+                <td class="px-6 py-4 font-mono text-xs text-accent whitespace-nowrap">${(c.clientId || c.id).substring(0, 10).toUpperCase()}</td>
+                <td class="px-6 py-4 font-medium text-text-primary whitespace-nowrap">${esc(c.fullName || '—')}</td>
+                <td class="px-6 py-4 text-text-muted text-xs whitespace-nowrap">${esc(c.email || '—')}</td>
+                <td class="px-6 py-4 text-text-muted text-xs whitespace-nowrap">${esc(c.phone || '—')}</td>
+                <td class="px-6 py-4 text-text-muted text-xs whitespace-nowrap">${formatDate(c.createdAt)}</td>
+                <td class="px-6 py-4 text-center font-semibold text-text-primary">${c._totalCases}</td>
+                <td class="px-6 py-4 text-center font-semibold text-accent">${c._activeCases}</td>
+                <td class="px-6 py-4">${statusBadge(status)}</td>
+                <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end space-x-1">
+                        <button onclick="openViewModal('${c.id}')" title="View Profile" class="text-accent hover:text-accent-light px-2 py-1 bg-accent/10 rounded-md text-xs font-bold transition"><i class="fas fa-eye"></i></button>
+                        ${status !== 'Suspended' ? `
+                        <button onclick="quickStatus('${c.id}','Suspended')" title="Suspend" class="text-red-400 hover:text-red-400 px-2 py-1 bg-red-900/20 rounded-md text-xs font-bold transition"><i class="fas fa-ban"></i></button>` : `
+                        <button onclick="quickStatus('${c.id}','Active')" title="Activate" class="text-green-400 hover:text-green-400 px-2 py-1 bg-green-900/20 rounded-md text-xs font-bold transition"><i class="fas fa-check-circle"></i></button>`}
+                        <button onclick="resetPasswordFor('${c.id}')" title="Reset Password" class="text-orange-500 hover:text-orange-400 px-2 py-1 bg-orange-900/20 rounded-md text-xs font-bold transition"><i class="fas fa-key"></i></button>
+                        <button onclick="openDeleteModal('${c.id}')" title="Delete" class="text-red-400 hover:text-red-400 px-2 py-1 bg-red-900/20 rounded-md text-xs font-bold transition"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </td>
+            </tr>`;
+            }).join('');
+        }
+
+        window.prevPage = function () { if (currentPage > 1) { currentPage--; renderTable(); } };
+        window.nextPage = function () {
+            const totalPages = Math.ceil(filteredClients.length / PAGE_SIZE) || 1;
+            if (currentPage < totalPages) { currentPage++; renderTable(); }
+        };
+
+        // =====================================================================
+        // QUICK STATUS
+        // =====================================================================
+        window.quickStatus = async function (id, newStatus) {
+            try {
+                const ref = doc(db, 'artifacts', appId, 'public', 'data', 'clients', id);
+                await updateDoc(ref, { status: newStatus, updatedAt: serverTimestamp() });
+                showToast(`Account ${newStatus === 'Suspended' ? 'suspended' : 'activated'} successfully.`, 'success');
+            } catch (e) {
+                console.error("Status update error:", e);
+                showToast('Failed to update status.', 'error');
+            }
+        };
+
+        // =====================================================================
+        // RESET PASSWORD
+        // =====================================================================
+        window.resetPasswordFor = async function (id) {
+            const client = allClients.find(c => c.id === id);
+            if (!client || !client.email) { showToast('Client email not found.', 'error'); return; }
+            try {
+                await sendPasswordResetEmail(auth, client.email);
+                showToast(`Password reset email sent to ${client.email}.`, 'success');
+            } catch (e) {
+                console.error("Password reset error:", e);
+                showToast('Failed to send password reset email.', 'error');
+            }
+        };
+
+        // =====================================================================
+        // VIEW MODAL
+        // =====================================================================
+        window.openViewModal = function (id) {
+            const c = allClients.find(x => x.id === id);
+            if (!c) return;
+            currentViewId = id;
+
+            document.getElementById('m-clientId').innerText = c.clientId || c.id;
+            document.getElementById('m-fullName').innerText = c.fullName || '—';
+            document.getElementById('m-email').innerText = c.email || '—';
+            document.getElementById('m-phone').innerText = c.phone || '—';
+            document.getElementById('m-date').innerText = formatDateTime(c.createdAt);
+            document.getElementById('m-status').innerHTML = statusBadge(c.status || 'Active');
+            document.getElementById('m-statusSelect').value = c.status || 'Active';
+
+            // Case summary
+            const clientCases = allCases.filter(cs => cs.clientId === c.id || cs.clientId === c.clientId);
+            const total = c.totalCases || clientCases.length;
+            const pending = clientCases.filter(cs => cs.status !== 'Resolved' && cs.status !== 'Rejected').length;
+            const closed = clientCases.filter(cs => cs.status === 'Resolved' || cs.status === 'Rejected').length;
+
+            document.getElementById('m-totalCases').innerText = total;
+            document.getElementById('m-pendingCases').innerText = pending;
+            document.getElementById('m-closedCases').innerText = closed;
+
+            // Cases list
+            const casesContainer = document.getElementById('m-casesList');
+            if (clientCases.length === 0) {
+                casesContainer.innerHTML = '<p class="px-4 py-3 text-sm text-text-muted">No cases associated.</p>';
+            } else {
+                casesContainer.innerHTML = clientCases.map(cs => `
+                <a href="cases.html" class="block px-4 py-3 hover:bg-surface-overlay transition">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="font-mono text-xs text-accent">${(cs.caseId || cs.id).substring(0, 10).toUpperCase()}</span>
+                            <span class="text-xs text-text-muted">${esc(cs.bank || '')}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            ${statusBadge(cs.status || 'New')}
+                            <i class="fas fa-chevron-right text-text-secondary text-xs"></i>
+                        </div>
+                    </div>
+                </a>
+            `).join('');
+            }
+
+            // Notes
+            const notes = c.notes || [];
+            const notesContainer = document.getElementById('m-notes');
+            if (notes.length === 0) {
+                notesContainer.innerHTML = '<p class="px-4 py-3 text-sm text-text-muted">No notes recorded.</p>';
+            } else {
+                notesContainer.innerHTML = notes.map(n => `
+                <div class="px-4 py-3">
+                    <p class="text-sm text-text-secondary">${esc(n.text || '')}</p>
+                    <p class="text-xs text-text-muted mt-1">${esc(n.by || 'Admin')} · ${formatDateTime(n.at)}</p>
+                </div>
+            `).join('');
+            }
+
+            document.getElementById('m-newNote').value = '';
+
+            const modal = document.getElementById('view-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeViewModal = function () {
+            document.getElementById('view-modal').classList.add('hidden');
+            document.getElementById('view-modal').classList.remove('flex');
+            currentViewId = null;
+        };
+
+        // =====================================================================
+        // ADD NOTE
+        // =====================================================================
+        window.addNote = async function () {
+            if (!currentViewId) return;
+            const text = document.getElementById('m-newNote').value.trim();
+            if (!text) { showToast('Please enter a note.', 'error'); return; }
+            try {
+                const ref = doc(db, 'artifacts', appId, 'public', 'data', 'clients', currentViewId);
+                await updateDoc(ref, {
+                    notes: arrayUnion({ text, by: adminEmail, at: new Date().toISOString() }),
+                    updatedAt: serverTimestamp()
+                });
+                document.getElementById('m-newNote').value = '';
+                showToast('Note added.', 'success');
+                setTimeout(() => { const c = allClients.find(x => x.id === currentViewId); if (c) openViewModal(currentViewId); }, 500);
+            } catch (e) {
+                console.error("Add note error:", e);
+                showToast('Failed to add note.', 'error');
+            }
+        };
+
+        // =====================================================================
+        // SAVE PROFILE CHANGES
+        // =====================================================================
+        window.saveProfileChanges = async function () {
+            if (!currentViewId) return;
+            const newStatus = document.getElementById('m-statusSelect').value;
+            const c = allClients.find(x => x.id === currentViewId);
+            if (!c) return;
+
+            try {
+                const ref = doc(db, 'artifacts', appId, 'public', 'data', 'clients', currentViewId);
+                const updates = { updatedAt: serverTimestamp() };
+
+                if (newStatus !== (c.status || 'Active')) {
+                    updates.status = newStatus;
+                }
+
+                await updateDoc(ref, updates);
+                showToast('Client profile updated.', 'success');
+                closeViewModal();
+            } catch (e) {
+                console.error("Save error:", e);
+                showToast('Failed to save changes.', 'error');
+            }
+        };
+
+        // =====================================================================
+        // RESET PASSWORD FROM MODAL
+        // =====================================================================
+        window.triggerResetPassword = async function () {
+            if (!currentViewId) return;
+            const c = allClients.find(x => x.id === currentViewId);
+            if (!c || !c.email) { showToast('Client email not available.', 'error'); return; }
+            try {
+                await sendPasswordResetEmail(auth, c.email);
+                showToast(`Password reset email sent to ${c.email}.`, 'success');
+            } catch (e) {
+                console.error("Reset password error:", e);
+                showToast('Failed to send reset email.', 'error');
+            }
+        };
+
+        // =====================================================================
+        // DELETE MODAL
+        // =====================================================================
+        window.openDeleteModal = function (id) {
+            currentDeleteId = id;
+            const c = allClients.find(x => x.id === id);
+            document.getElementById('delete-modal-name').innerText = c?.fullName || '—';
+            document.getElementById('delete-modal-id').innerText = c?.clientId || id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+            document.getElementById('delete-modal').classList.add('flex');
+        };
+
+        window.closeDeleteModal = function () {
+            document.getElementById('delete-modal').classList.add('hidden');
+            document.getElementById('delete-modal').classList.remove('flex');
+            currentDeleteId = null;
+        };
+
+        window.confirmDelete = async function () {
+            if (!currentDeleteId) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', currentDeleteId));
+                showToast('Client account deleted permanently.', 'success');
+                closeDeleteModal();
+            } catch (e) {
+                console.error("Delete error:", e);
+                showToast('Failed to delete account.', 'error');
+            }
+        };
+
+        // =====================================================================
+        // HELPERS
+        // =====================================================================
+        function statusBadge(status) {
+            const s = (status || '').toLowerCase();
+            const map = {
+                'active': 'bg-green-900/30 text-green-400 border-green-800/40',
+                'suspended': 'bg-red-900/30 text-red-800 border-red-800/40',
+                'under review': 'bg-yellow-900/30 text-yellow-400 border-yellow-800/40',
+                'new': 'bg-red-900/30 text-red-800 border-red-800/40',
+                'under review': 'bg-yellow-900/30 text-yellow-400 border-yellow-800/40',
+                'awaiting client': 'bg-orange-900/30 text-orange-400 border-orange-800/40',
+                'resolved': 'bg-green-900/30 text-green-400 border-green-800/40',
+                'rejected': 'bg-surface-overlay text-text-secondary border-surface-border',
+            };
+            const cls = map[s] || 'bg-surface-overlay text-text-secondary border-surface-border';
+            return `<span class="px-2 py-1 rounded text-xs font-bold border ${cls}">${status}</span>`;
+        }
+
+        function formatDate(val) {
+            if (!val) return '—';
+            const d = typeof val.toDate === 'function' ? val.toDate() : new Date(val);
+            return isNaN(d) ? '—' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatDateTime(val) {
+            if (!val) return '—';
+            const d = typeof val.toDate === 'function' ? val.toDate() : new Date(val);
+            if (isNaN(d)) return '—';
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+                ' · ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function esc(text) {
+            const el = document.createElement('div');
+            el.textContent = text;
+            return el.innerHTML;
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const inner = document.getElementById('toast-inner');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+            msg.innerText = message;
+            inner.className = 'flex items-center px-5 py-3 rounded-xl shadow-lg border text-sm font-medium';
+            if (type === 'success') {
+                inner.classList.add('bg-green-900/20', 'text-green-400', 'border-green-800/40');
+                icon.className = 'fas fa-check-circle mr-2 text-green-400';
+            } else {
+                inner.classList.add('bg-red-900/20', 'text-red-800', 'border-red-800/40');
+                icon.className = 'fas fa-exclamation-circle mr-2 text-red-600';
+            }
+            toast.classList.remove('hidden', 'translate-y-4', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3500);
+        }
+
+        // =====================================================================
+        // MOBILE MENU
+        // =====================================================================
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.querySelector('aside');
+        const overlay = document.getElementById('mobile-overlay');
+        if (mobileBtn && sidebar && overlay) {
+            mobileBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('absolute');
+                sidebar.classList.toggle('h-full');
+                overlay.classList.toggle('hidden');
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('absolute', 'h-full');
+                overlay.classList.add('hidden');
+            });
+        }
+    </script>
+</body>
+
+</html>

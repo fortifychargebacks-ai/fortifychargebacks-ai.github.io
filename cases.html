@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Management - Fortify Chargebacks</title>
+    <link rel="icon" href="../public/images/Logo%201.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        surface: { DEFAULT: '#0f1115', raised: '#161922', overlay: '#1c2030', border: '#262b3a' },
+                        accent: { DEFAULT: '#2563eb', light: '#3b82f6', muted: '#1e3a5f' },
+                        text: { primary: '#e8eaed', secondary: '#9ca3af', muted: '#6b7280' }
+                    },
+                    fontFamily: { sans: ['Poppins', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #0f1115;
+            color: #e8eaed;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #262b3a;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #262b3a;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        .nav-blur {
+            background: rgba(15, 17, 21, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased h-screen overflow-hidden" style="background-color:#0f1115; color:#e8eaed;">
+
+    <!-- ====================================================================== -->
+    <!-- LOADING SCREEN                                                         -->
+    <!-- ====================================================================== -->
+    <div id="loading-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center"
+        style="background-color:#0f1115;">
+        <i class="fas fa-shield-alt text-5xl text-accent mb-4 animate-pulse"></i>
+        <h2 class="text-xl font-bold text-text-primary mb-2">Verifying Credentials</h2>
+        <p class="text-text-secondary text-sm flex items-center">
+            <i class="fas fa-circle-notch fa-spin mr-2"></i> Connecting to secure server...
+        </p>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- DASHBOARD UI                                                           -->
+    <!-- ====================================================================== -->
+    <div id="dashboard-ui" class="hidden h-full flex w-full" style="background-color:#0f1115;">
+
+        <!-- SIDEBAR -->
+        <aside
+            class="w-64 bg-surface-raised text-text-primary flex flex-col transition-all duration-300 z-20 hidden md:flex border-r border-surface-border">
+            <div class="h-20 flex items-center justify-center border-b border-surface-border px-4">
+                <img class="h-10 w-auto mr-3" src="../public/images/Logo%202.png" alt="Logo"
+                    onerror="this.style.display='none'">
+                <span class="font-bold text-lg tracking-tight text-text-primary">FORTIFY</span>
+            </div>
+            <nav class="flex-1 overflow-y-auto custom-scrollbar py-6 space-y-2 px-3">
+                <a href="dashboard.html"
+                    class="flex items-center px-4 py-3 text-text-secondary hover:bg-accent/20 hover:text-text-primary rounded-lg transition">
+                    <i class="fas fa-chart-pie w-6"></i><span class="font-medium">Dashboard</span>
+                </a>
+                <a href="clients.html"
+                    class="flex items-center px-4 py-3 text-text-secondary hover:bg-accent/20 hover:text-text-primary rounded-lg transition">
+                    <i class="fas fa-users w-6"></i><span class="font-medium">Client Accounts</span>
+                </a>
+                <a href="cases.html" class="flex items-center px-4 py-3 bg-accent text-white rounded-lg transition">
+                    <i class="fas fa-file-invoice-dollar w-6"></i><span class="font-medium">Submitted Cases</span>
+                </a>
+                <a href="inquiries.html"
+                    class="flex items-center px-4 py-3 text-text-secondary hover:bg-accent/20 hover:text-text-primary rounded-lg transition">
+                    <i class="fas fa-envelope w-6"></i><span class="font-medium">Contact Inquiries</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-surface-border">
+                <button onclick="handleLogout()"
+                    class="w-full flex items-center px-4 py-2 text-text-secondary hover:text-red-400 hover:bg-red-400/10 rounded-lg transition">
+                    <i class="fas fa-sign-out-alt w-6"></i><span class="font-medium">Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative" style="background-color:#0f1115;">
+
+            <!-- TOP NAVBAR -->
+            <header
+                class="h-20 bg-surface-raised flex items-center justify-between px-6 lg:px-10 z-10 border-b border-surface-border">
+                <div class="flex items-center">
+                    <button id="mobile-menu-btn" class="md:hidden text-text-muted hover:text-accent mr-4">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-xl font-bold text-text-primary">Case Management</h1>
+                        <p class="text-xs text-text-muted leading-tight">Review and manage submitted chargeback cases
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="hidden sm:flex items-center">
+                        <span
+                            class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-bold border border-accent/20 flex items-center">
+                            <i class="fas fa-shield-alt mr-1.5"></i> Admin
+                        </span>
+                    </div>
+                    <div class="h-8 w-px bg-gray-200 mx-2 hidden sm:block"></div>
+                    <div class="flex items-center space-x-3 cursor-pointer">
+                        <div
+                            class="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center border border-surface-border text-accent font-bold">
+                            A</div>
+                        <div class="hidden md:block text-sm">
+                            <p class="font-bold text-text-primary leading-tight" id="admin-email-display">Loading...</p>
+                            <p class="text-xs text-text-muted">System Administrator</p>
+                        </div>
+                    </div>
+                    <button onclick="handleLogout()" class="md:hidden text-text-muted hover:text-red-400 ml-2">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- SCROLLABLE CONTENT -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10">
+
+                <!-- SUMMARY CARDS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-accent/10 flex items-center justify-center text-accent mr-4">
+                            <i class="fas fa-file-invoice-dollar text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">Total Cases</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-total">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-yellow-900/20 flex items-center justify-center text-yellow-400 mr-4">
+                            <i class="fas fa-clock text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">Pending Review</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-pending">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-orange-900/20 flex items-center justify-center text-orange-600 mr-4">
+                            <i class="fas fa-user-clock text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">Awaiting Client</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-awaiting">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-surface-raised rounded-xl p-6 border border-surface-border flex items-center">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-green-900/20 flex items-center justify-center text-green-400 mr-4">
+                            <i class="fas fa-check-circle text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-text-muted">Closed Cases</p>
+                            <p class="text-2xl font-bold text-text-primary" id="stat-closed">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CASES TABLE -->
+                <div class="bg-surface-raised rounded-2xl border border-surface-border overflow-hidden">
+                    <div
+                        class="px-6 py-5 border-b border-surface-border flex flex-col sm:flex-row sm:justify-between sm:items-center  gap-3">
+                        <h2 class="text-lg font-bold text-text-primary">All Cases</h2>
+                        <div class="flex items-center space-x-2 flex-wrap gap-y-2">
+                            <button data-filter="all"
+                                class="filter-btn active-filter px-3 py-1.5 rounded-lg text-xs font-bold transition border">All</button>
+                            <button data-filter="Open"
+                                class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold transition border text-text-muted border-surface-border bg-surface-raised hover:bg-surface-overlay">Open</button>
+                            <button data-filter="Under Review"
+                                class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold transition border text-text-muted border-surface-border bg-surface-raised hover:bg-surface-overlay">Under
+                                Review</button>
+                            <button data-filter="Awaiting Client"
+                                class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold transition border text-text-muted border-surface-border bg-surface-raised hover:bg-surface-overlay">Awaiting
+                                Client</button>
+                            <button data-filter="Resolved"
+                                class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold transition border text-text-muted border-surface-border bg-surface-raised hover:bg-surface-overlay">Resolved</button>
+                            <button data-filter="Rejected"
+                                class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold transition border text-text-muted border-surface-border bg-surface-raised hover:bg-surface-overlay">Rejected</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left text-sm text-text-secondary">
+                            <thead class="bg-surface-overlay text-xs text-text-muted uppercase font-semibold">
+                                <tr>
+                                    <th class="px-6 py-4">Case ID</th>
+                                    <th class="px-6 py-4">Client Name</th>
+                                    <th class="px-6 py-4">Email</th>
+                                    <th class="px-6 py-4">Amount</th>
+                                    <th class="px-6 py-4">Bank / Network</th>
+                                    <th class="px-6 py-4">Submitted</th>
+                                    <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4">Priority</th>
+                                    <th class="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cases-table-body" class="divide-y divide-surface-border">
+                                <tr>
+                                    <td colspan="9" class="px-6 py-12 text-center text-text-muted">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i> Loading cases...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-10 hidden md:hidden"></div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- VIEW CASE MODAL                                                        -->
+    <!-- ====================================================================== -->
+    <div id="view-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop bg-black/60">
+        <div
+            class="bg-surface-raised rounded-2xl shadow-2xl w-full max-w-4xl mx-4 max-h-[92vh] flex flex-col overflow-hidden border border-surface-border">
+            <!-- Header -->
+            <div class="px-6 py-5 border-b border-surface-border flex justify-between items-center  shrink-0">
+                <h3 class="text-lg font-bold text-text-primary flex items-center">
+                    <i class="fas fa-folder-open mr-2 text-accent"></i> Case Details
+                </h3>
+                <button onclick="closeViewModal()" class="text-text-muted hover:text-text-secondary transition">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+
+                <!-- Case Info Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Case ID</label>
+                        <p class="text-sm font-mono text-accent mt-1" id="m-caseId">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Client Name</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="m-clientName">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Email</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="m-email">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Amount</label>
+                        <p class="text-sm font-bold text-text-primary mt-1" id="m-amount">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Bank /
+                            Network</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="m-bank">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Submitted</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="m-date">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Current
+                            Status</label>
+                        <p class="mt-1" id="m-status">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Priority</label>
+                        <p class="mt-1" id="m-priority">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Reason Code</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="m-reasonCode">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Order ID</label>
+                        <p class="text-sm font-mono text-text-primary mt-1" id="m-orderId">—</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Processor</label>
+                        <p class="text-sm font-medium text-text-primary mt-1" id="m-processor">—</p>
+                    </div>
+                </div>
+
+                <!-- Case Description -->
+                <div>
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Case
+                        Description</label>
+                    <div class="mt-2 p-4 bg-surface-overlay rounded-lg border border-surface-border text-sm text-text-secondary leading-relaxed whitespace-pre-wrap"
+                        id="m-description">No description provided.</div>
+                </div>
+                <!-- Client Reply (shown when client responds to admin request) -->
+                <div id="m-clientReply-section" class="hidden">
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Client Reply</label>
+                    <div class="mt-2 p-4 bg-accent/10 rounded-lg border border-accent/30 text-sm text-accent-light leading-relaxed whitespace-pre-wrap"
+                        id="m-clientReply">No reply yet.</div>
+                </div>
+
+                <!-- Admin Request Info Sent -->
+                <div id="m-requestedInfo-section" class="hidden">
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Information Requested
+                        from Client</label>
+                    <div class="mt-2 p-4 bg-amber-900/20 rounded-lg border border-amber-800/40 text-sm text-amber-400 leading-relaxed whitespace-pre-wrap"
+                        id="m-requestedInfoDisplay">—</div>
+                </div>
+
+                <!-- Case Timeline -->
+                <div>
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Case Timeline</label>
+                    <div class="mt-2 border border-surface-border rounded-lg divide-y divide-surface-border max-h-48 overflow-y-auto custom-scrollbar"
+                        id="m-timeline">
+                        <p class="px-4 py-3 text-sm text-text-muted">No timeline entries.</p>
+                    </div>
+                </div>
+
+                <!-- Uploaded Documents -->
+                <div>
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Uploaded
+                        Documents</label>
+                    <div class="mt-2 border border-surface-border rounded-lg p-4" id="m-documents">
+                        <p class="text-sm text-text-muted">No documents attached.</p>
+                    </div>
+                </div>
+
+                <!-- Internal Admin Notes -->
+                <div>
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Internal Admin
+                        Notes</label>
+                    <div class="mt-2 border border-surface-border rounded-lg divide-y divide-surface-border max-h-40 overflow-y-auto custom-scrollbar"
+                        id="m-notes">
+                        <p class="px-4 py-3 text-sm text-text-muted">No notes recorded.</p>
+                    </div>
+                    <textarea id="m-newNote" rows="2" placeholder="Add an internal note..."
+                        class="mt-3 w-full px-4 py-3 bg-surface-overlay border border-surface-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition resize-none"></textarea>
+                    <button onclick="addInternalNote()"
+                        class="mt-2 px-4 py-2 text-xs font-bold text-accent bg-accent/10 border border-accent/20 rounded-lg hover:bg-accent/20 transition">
+                        <i class="fas fa-plus mr-1"></i> Add Note
+                    </button>
+                </div>
+
+                <!-- Change Status -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Update
+                            Status</label>
+                        <select id="m-statusSelect"
+                            class="mt-2 w-full px-4 py-3 border border-surface-border rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition bg-surface-raised">
+                            <option value="Open">Open</option>
+                            <option value="Under Review">Under Review</option>
+                            <option value="Awaiting Client">Awaiting Client</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Update
+                            Priority</label>
+                        <select id="m-prioritySelect"
+                            class="mt-2 w-full px-4 py-3 border border-surface-border rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition bg-surface-raised">
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Request Information -->
+                <div>
+                    <label class="text-xs font-semibold text-text-muted uppercase tracking-wide">Request Information
+                        from
+                        Client</label>
+                    <p class="text-xs text-text-muted mt-1">This message will be visible on the client's dashboard.</p>
+                    <textarea id="m-requestInfo" rows="3"
+                        placeholder="Describe the information needed from the client..."
+                        class="mt-2 w-full px-4 py-3 bg-surface-overlay border border-surface-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 border-t border-surface-border  flex flex-col sm:flex-row justify-end gap-3 shrink-0">
+                <button onclick="closeViewModal()"
+                    class="px-4 py-2.5 text-sm font-medium text-text-secondary bg-surface-raised border border-surface-border rounded-lg hover:bg-surface-overlay transition">
+                    Cancel
+                </button>
+                <button onclick="saveAllChanges()" id="save-btn"
+                    class="px-5 py-2.5 text-sm font-bold text-white bg-accent rounded-lg hover:bg-brand-dark transition flex items-center justify-center">
+                    <i class="fas fa-save mr-2"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- DELETE CONFIRMATION MODAL                                              -->
+    <!-- ====================================================================== -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop bg-black/60">
+        <div
+            class="bg-surface-raised rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-surface-border">
+            <div class="px-6 py-5 border-b border-surface-border bg-red-900/20/50">
+                <h3 class="text-lg font-bold text-red-400 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Confirm Deletion
+                </h3>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-text-secondary">Are you sure you want to permanently delete this case? This
+                    action
+                    cannot be undone.</p>
+                <div class="mt-4 p-3 bg-surface-overlay rounded-lg border border-surface-border">
+                    <p class="text-xs text-text-muted">Case ID</p>
+                    <p class="text-sm font-mono text-accent font-medium" id="delete-modal-id">—</p>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-surface-border  flex justify-end gap-3">
+                <button onclick="closeDeleteModal()"
+                    class="px-4 py-2.5 text-sm font-medium text-text-secondary bg-surface-raised border border-surface-border rounded-lg hover:bg-surface-overlay transition">Cancel</button>
+                <button onclick="confirmDelete()"
+                    class="px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 transition flex items-center justify-center">
+                    <i class="fas fa-trash-alt mr-2"></i> Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- TOAST                                                                  -->
+    <!-- ====================================================================== -->
+    <div id="toast"
+        class="fixed bottom-6 right-6 z-50 hidden transform transition-all duration-300 translate-y-4 opacity-0">
+        <div class="flex items-center px-5 py-3 rounded-xl shadow-lg border text-sm font-medium" id="toast-inner">
+            <i class="mr-2" id="toast-icon"></i>
+            <span id="toast-message"></span>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- FIREBASE & PAGE LOGIC                                                  -->
+    <!-- ====================================================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore, doc, getDoc, collection, onSnapshot,
+            updateDoc, deleteDoc, serverTimestamp, query, orderBy, arrayUnion, Timestamp
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCuWWO8g2pBQlvjNUd22R9QL0AKgp2JAGg",
+            authDomain: "fortify-chargebacks.firebaseapp.com",
+            projectId: "fortify-chargebacks",
+            storageBucket: "fortify-chargebacks.firebasestorage.app",
+            messagingSenderId: "761574321330",
+            appId: "1:761574321330:web:827dc221dd6a1b64eb6dab"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // =====================================================================
+        // STATE
+        // =====================================================================
+        let allCases = [];
+        let currentFilter = 'all';
+        let currentViewId = null;
+        let currentDeleteId = null;
+        let adminEmail = 'Admin';
+
+        // =====================================================================
+        // AUTH
+        // =====================================================================
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            try {
+                const adminDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'admins', user.uid);
+                const adminDocSnap = await getDoc(adminDocRef);
+
+                if (!adminDocSnap.exists() || adminDocSnap.data().role !== 'admin') {
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                    return;
+                }
+            } catch (error) {
+                console.warn("Admin doc read failed (rules may not be published yet):", error.message);
+            }
+            // Proceed — user is authenticated
+            adminEmail = user.email || 'Admin';
+            document.getElementById('admin-email-display').innerText = adminEmail;
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('dashboard-ui').classList.remove('hidden');
+            listenToCases();
+        });
+
+        window.handleLogout = async function () {
+            try { await signOut(auth); window.location.href = 'login.html'; }
+            catch (e) { console.error("Logout error:", e); }
+        };
+
+        // =====================================================================
+        // REAL-TIME LISTENER
+        // =====================================================================
+        function listenToCases() {
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'cases');
+            const q = query(colRef, orderBy('createdAt', 'desc'));
+
+            onSnapshot(q, (snap) => {
+                allCases = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                updateStats();
+                renderTable();
+            }, () => {
+                // Fallback without index
+                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'cases'), (snap) => {
+                    allCases = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    allCases.sort((a, b) => {
+                        const dA = a.createdAt?.toMillis?.() || 0;
+                        const dB = b.createdAt?.toMillis?.() || 0;
+                        return dB - dA;
+                    });
+                    updateStats();
+                    renderTable();
+                });
+            });
+        }
+
+        // =====================================================================
+        // STATS
+        // =====================================================================
+        function updateStats() {
+            const total = allCases.length;
+            const pending = allCases.filter(c => c.status === 'Open' || c.status === 'New' || c.status === 'Under Review').length;
+            const awaiting = allCases.filter(c => c.status === 'Awaiting Client').length;
+            const closed = allCases.filter(c => c.status === 'Resolved' || c.status === 'Rejected').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-pending').innerText = pending;
+            document.getElementById('stat-awaiting').innerText = awaiting;
+            document.getElementById('stat-closed').innerText = closed;
+        }
+
+        // =====================================================================
+        // RENDER TABLE
+        // =====================================================================
+        function renderTable() {
+            const tbody = document.getElementById('cases-table-body');
+            let filtered = allCases;
+
+            if (currentFilter !== 'all') {
+                filtered = allCases.filter(c => (c.status || 'Open') === currentFilter);
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="px-6 py-16 text-center">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-folder-open text-4xl text-text-secondary mb-3"></i>
+                            <p class="text-text-muted font-medium">No cases available.</p>
+                            <p class="text-text-muted text-xs mt-1">Submitted chargeback cases will appear here.</p>
+                        </div>
+                    </td>
+                </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(c => {
+                const status = c.status || 'Open';
+                const priority = c.priority || 'Medium';
+
+                return `
+            <tr class="hover:bg-surface-overlay transition">
+                <td class="px-6 py-4 font-mono text-xs text-accent whitespace-nowrap">${c.caseNumber || (c.caseId || c.id).substring(0, 10).toUpperCase()}</td>
+                <td class="px-6 py-4 font-medium text-text-primary whitespace-nowrap">${esc(c.clientName || '—')}</td>
+                <td class="px-6 py-4 text-text-muted text-xs whitespace-nowrap">${esc(c.clientEmail || c.email || '—')}</td>
+                <td class="px-6 py-4 font-semibold text-text-primary whitespace-nowrap">${formatAmount(c.amount)}</td>
+                <td class="px-6 py-4 text-text-secondary text-xs whitespace-nowrap">${esc(c.network || c.bank || '—')}</td>
+                <td class="px-6 py-4 text-text-muted text-xs whitespace-nowrap">${formatDate(c.createdAt)}</td>
+                <td class="px-6 py-4">${statusBadge(status)}</td>
+                <td class="px-6 py-4">${priorityBadge(priority)}</td>
+                <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end space-x-1">
+                        <button onclick="openViewModal('${c.id}')" title="View Case" class="text-accent hover:text-accent-light px-2 py-1 bg-accent/10 rounded-md text-xs font-bold transition"><i class="fas fa-eye"></i></button>
+                        <button onclick="quickStatus('${c.id}','Under Review')" title="Mark Under Review" class="text-yellow-400 hover:text-yellow-700 px-2 py-1 bg-yellow-900/20 rounded-md text-xs font-bold transition"><i class="fas fa-search"></i></button>
+                        <button onclick="quickStatus('${c.id}','Awaiting Client')" title="Request Info" class="text-orange-600 hover:text-orange-400 px-2 py-1 bg-orange-900/20 rounded-md text-xs font-bold transition"><i class="fas fa-question-circle"></i></button>
+                        <button onclick="quickStatus('${c.id}','Resolved')" title="Close / Resolve" class="text-green-400 hover:text-green-400 px-2 py-1 bg-green-900/20 rounded-md text-xs font-bold transition"><i class="fas fa-check"></i></button>
+                        <button onclick="openDeleteModal('${c.id}')" title="Delete" class="text-red-400 hover:text-red-400 px-2 py-1 bg-red-900/20 rounded-md text-xs font-bold transition"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </td>
+            </tr>`;
+            }).join('');
+        }
+
+        // =====================================================================
+        // QUICK STATUS UPDATE
+        // =====================================================================
+        window.quickStatus = async function (id, newStatus) {
+            try {
+                const ref = doc(db, 'artifacts', appId, 'public', 'data', 'cases', id);
+                const timelineEntry = {
+                    action: `Status changed to "${newStatus}"`,
+                    by: adminEmail,
+                    at: new Date().toISOString()
+                };
+                await updateDoc(ref, {
+                    status: newStatus,
+                    updatedAt: serverTimestamp(),
+                    timeline: arrayUnion(timelineEntry)
+                });
+                showToast(`Case status updated to "${newStatus}".`, 'success');
+            } catch (e) {
+                console.error("Quick status error:", e);
+                showToast('Failed to update status.', 'error');
+            }
+        };
+
+        // =====================================================================
+        // VIEW MODAL
+        // =====================================================================
+        window.openViewModal = function (id) {
+            const c = allCases.find(x => x.id === id);
+            if (!c) return;
+            currentViewId = id;
+
+            document.getElementById('m-caseId').innerText = c.caseNumber || (c.caseId || c.id);
+            document.getElementById('m-clientName').innerText = c.clientName || '—';
+            document.getElementById('m-email').innerText = c.clientEmail || c.email || '—';
+            document.getElementById('m-amount').innerText = formatAmount(c.amount);
+            document.getElementById('m-bank').innerText = c.network || c.bank || '—';
+            document.getElementById('m-date').innerText = formatDateTime(c.createdAt);
+            document.getElementById('m-status').innerHTML = statusBadge(c.status || 'Open');
+            document.getElementById('m-priority').innerHTML = priorityBadge(c.priority || 'Medium');
+            document.getElementById('m-reasonCode').innerText = c.reasonCode || '—';
+            document.getElementById('m-orderId').innerText = c.orderId || c.transactionId || '—';
+            document.getElementById('m-processor').innerText = c.processor || '—';
+            document.getElementById('m-description').innerText = c.description || 'No description provided.';
+
+            // Client Reply
+            const replySection = document.getElementById('m-clientReply-section');
+            if (c.clientReply) {
+                replySection.classList.remove('hidden');
+                document.getElementById('m-clientReply').innerText = c.clientReply;
+            } else {
+                replySection.classList.add('hidden');
+            }
+
+            // Requested Info display
+            const reqInfoSection = document.getElementById('m-requestedInfo-section');
+            if (c.requestedInfo) {
+                reqInfoSection.classList.remove('hidden');
+                document.getElementById('m-requestedInfoDisplay').innerText = c.requestedInfo;
+            } else {
+                reqInfoSection.classList.add('hidden');
+            }
+
+            // Status & Priority selects
+            document.getElementById('m-statusSelect').value = c.status || 'Open';
+            document.getElementById('m-prioritySelect').value = c.priority || 'Medium';
+
+            // Request info
+            document.getElementById('m-requestInfo').value = c.requestedInfo || '';
+
+            // Timeline
+            const timeline = c.timeline || [];
+            const tlContainer = document.getElementById('m-timeline');
+            if (timeline.length === 0) {
+                tlContainer.innerHTML = '<p class="px-4 py-3 text-sm text-text-muted">No timeline entries.</p>';
+            } else {
+                tlContainer.innerHTML = timeline.map(t => `
+                <div class="px-4 py-3 flex items-start space-x-3">
+                    <div class="w-2 h-2 mt-1.5 rounded-full bg-accent shrink-0"></div>
+                    <div class="flex-1">
+                        <p class="text-sm text-text-secondary">${esc(t.action || '')}</p>
+                        <p class="text-xs text-text-muted mt-0.5">${esc(t.by || 'System')} · ${formatDateTime(t.at)}</p>
+                    </div>
+                </div>
+            `).join('');
+            }
+
+            // Documents (evidenceFiles from submit-case form)
+            const docs = c.evidenceFiles || c.documents || [];
+            const docsContainer = document.getElementById('m-documents');
+            if (docs.length === 0) {
+                docsContainer.innerHTML = '<p class="text-sm text-text-muted">No documents attached.</p>';
+            } else {
+                docsContainer.innerHTML = `<div class="flex flex-wrap gap-2">${docs.map((d, i) => {
+                    const url = typeof d === 'string' ? d : (d.url || '#');
+                    const name = typeof d === 'string' ? ('Document ' + (i + 1)) : (d.name || 'Document ' + (i + 1));
+                    return `<a href="${url}" target="_blank" class="flex items-center px-3 py-2 bg-surface-overlay border border-surface-border rounded-lg text-xs font-medium text-accent hover:bg-accent/10 transition">
+                    <i class="fas fa-file-download mr-2"></i> ${esc(name)}
+                </a>`;
+                }).join('')}</div>`;
+            }
+
+            // Notes
+            const notes = c.notes || [];
+            const notesContainer = document.getElementById('m-notes');
+            if (notes.length === 0) {
+                notesContainer.innerHTML = '<p class="px-4 py-3 text-sm text-text-muted">No notes recorded.</p>';
+            } else {
+                notesContainer.innerHTML = notes.map(n => `
+                <div class="px-4 py-3">
+                    <p class="text-sm text-text-secondary">${esc(n.text || '')}</p>
+                    <p class="text-xs text-text-muted mt-1">${esc(n.by || 'Admin')} · ${formatDateTime(n.at)}</p>
+                </div>
+            `).join('');
+            }
+
+            document.getElementById('m-newNote').value = '';
+
+            const modal = document.getElementById('view-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeViewModal = function () {
+            document.getElementById('view-modal').classList.add('hidden');
+            document.getElementById('view-modal').classList.remove('flex');
+            currentViewId = null;
+        };
+
+        // =====================================================================
+        // ADD INTERNAL NOTE
+        // =====================================================================
+        window.addInternalNote = async function () {
+            if (!currentViewId) return;
+            const text = document.getElementById('m-newNote').value.trim();
+            if (!text) { showToast('Please enter a note.', 'error'); return; }
+
+            try {
+                const ref = doc(db, 'artifacts', appId, 'public', 'data', 'cases', currentViewId);
+                const entry = { text, by: adminEmail, at: new Date().toISOString() };
+                await updateDoc(ref, { notes: arrayUnion(entry), updatedAt: serverTimestamp() });
+                document.getElementById('m-newNote').value = '';
+                showToast('Note added successfully.', 'success');
+
+                // Refresh modal content
+                setTimeout(() => {
+                    const c = allCases.find(x => x.id === currentViewId);
+                    if (c) openViewModal(currentViewId);
+                }, 500);
+            } catch (e) {
+                console.error("Add note error:", e);
+                showToast('Failed to add note.', 'error');
+            }
+        };
+
+        // =====================================================================
+        // SAVE ALL CHANGES (Status, Priority, Request Info)
+        // =====================================================================
+        window.saveAllChanges = async function () {
+            if (!currentViewId) return;
+
+            const newStatus = document.getElementById('m-statusSelect').value;
+            const newPriority = document.getElementById('m-prioritySelect').value;
+            const reqInfo = document.getElementById('m-requestInfo').value.trim();
+
+            const c = allCases.find(x => x.id === currentViewId);
+            if (!c) return;
+
+            const updates = { updatedAt: serverTimestamp() };
+            const timelineEntries = [];
+
+            if (newStatus !== (c.status || 'Open')) {
+                updates.status = newStatus;
+                timelineEntries.push({
+                    action: `Status changed from "${c.status || 'Open'}" to "${newStatus}"`,
+                    by: adminEmail,
+                    at: new Date().toISOString()
+                });
+            }
+
+            if (newPriority !== (c.priority || 'Medium')) {
+                updates.priority = newPriority;
+                timelineEntries.push({
+                    action: `Priority changed from "${c.priority || 'Medium'}" to "${newPriority}"`,
+                    by: adminEmail,
+                    at: new Date().toISOString()
+                });
+            }
+
+            if (reqInfo && reqInfo !== (c.requestedInfo || '')) {
+                updates.requestedInfo = reqInfo;
+                updates.status = 'Awaiting Client';
+                timelineEntries.push({
+                    action: 'Information requested from client',
+                    by: adminEmail,
+                    at: new Date().toISOString()
+                });
+            }
+
+            try {
+                const ref = doc(db, 'artifacts', appId, 'public', 'data', 'cases', currentViewId);
+
+                // Apply timeline entries one by one via arrayUnion
+                for (const entry of timelineEntries) {
+                    await updateDoc(ref, { timeline: arrayUnion(entry) });
+                }
+
+                await updateDoc(ref, updates);
+                showToast('Case updated successfully.', 'success');
+                closeViewModal();
+            } catch (e) {
+                console.error("Save error:", e);
+                showToast('Failed to save changes.', 'error');
+            }
+        };
+
+        // =====================================================================
+        // DELETE MODAL
+        // =====================================================================
+        window.openDeleteModal = function (id) {
+            currentDeleteId = id;
+            const c = allCases.find(x => x.id === id);
+            document.getElementById('delete-modal-id').innerText = (c?.caseNumber || c?.caseId || id);
+            document.getElementById('delete-modal').classList.remove('hidden');
+            document.getElementById('delete-modal').classList.add('flex');
+        };
+
+        window.closeDeleteModal = function () {
+            document.getElementById('delete-modal').classList.add('hidden');
+            document.getElementById('delete-modal').classList.remove('flex');
+            currentDeleteId = null;
+        };
+
+        window.confirmDelete = async function () {
+            if (!currentDeleteId) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'cases', currentDeleteId));
+                showToast('Case deleted permanently.', 'success');
+                closeDeleteModal();
+            } catch (e) {
+                console.error("Delete error:", e);
+                showToast('Failed to delete case.', 'error');
+            }
+        };
+
+        // =====================================================================
+        // FILTER TABS
+        // =====================================================================
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentFilter = btn.dataset.filter;
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active-filter', 'bg-accent', 'text-white', 'border-accent');
+                    b.classList.add('text-text-muted', 'border-surface-border', 'bg-surface-raised');
+                });
+                btn.classList.add('active-filter', 'bg-accent', 'text-white', 'border-accent');
+                btn.classList.remove('text-text-muted', 'border-surface-border', 'bg-surface-raised');
+                renderTable();
+            });
+        });
+
+        // Initialize "All" as active
+        const allBtn = document.querySelector('[data-filter="all"]');
+        if (allBtn) {
+            allBtn.classList.add('bg-accent', 'text-white', 'border-accent');
+            allBtn.classList.remove('text-text-muted', 'border-surface-border', 'bg-surface-raised');
+        }
+
+        // =====================================================================
+        // HELPERS
+        // =====================================================================
+        function statusBadge(status) {
+            const s = (status || '').toLowerCase();
+            const map = {
+                'open': 'bg-blue-900/30 text-blue-400 border-blue-800/40',
+                'new': 'bg-red-900/30 text-red-400 border-red-800/40',
+                'under review': 'bg-yellow-900/30 text-yellow-400 border-yellow-800/40',
+                'awaiting client': 'bg-orange-900/30 text-orange-400 border-orange-800/40',
+                'resolved': 'bg-green-900/30 text-green-400 border-green-800/40',
+                'rejected': 'bg-surface-overlay text-text-secondary border-surface-border',
+            };
+            const cls = map[s] || 'bg-surface-overlay text-text-secondary border-surface-border';
+            return `<span class="px-2 py-1 rounded text-xs font-bold border ${cls}">${status}</span>`;
+        }
+
+        function priorityBadge(priority) {
+            const p = (priority || '').toLowerCase();
+            const map = {
+                'high': 'bg-red-900/30 text-red-400 border-red-800/40',
+                'medium': 'bg-yellow-900/30 text-yellow-400 border-yellow-800/40',
+                'low': 'bg-blue-900/30 text-blue-400 border-blue-800/40',
+            };
+            const cls = map[p] || 'bg-surface-overlay text-text-secondary border-surface-border';
+            return `<span class="px-2 py-1 rounded text-xs font-bold border ${cls}">${priority}</span>`;
+        }
+
+        function formatDate(val) {
+            if (!val) return '—';
+            const d = typeof val.toDate === 'function' ? val.toDate() : new Date(val);
+            return isNaN(d) ? '—' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatDateTime(val) {
+            if (!val) return '—';
+            const d = typeof val.toDate === 'function' ? val.toDate() : new Date(val);
+            if (isNaN(d)) return '—';
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+                ' · ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatAmount(val) {
+            if (val === undefined || val === null || val === '') return '—';
+            const num = parseFloat(val);
+            return isNaN(num) ? String(val) : '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function esc(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const inner = document.getElementById('toast-inner');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+            msg.innerText = message;
+            inner.className = 'flex items-center px-5 py-3 rounded-xl shadow-lg border text-sm font-medium';
+            if (type === 'success') {
+                inner.classList.add('bg-green-900/20', 'text-green-400', 'border-green-800/40');
+                icon.className = 'fas fa-check-circle mr-2 text-green-400';
+            } else {
+                inner.classList.add('bg-red-900/20', 'text-red-800', 'border-red-800/40');
+                icon.className = 'fas fa-exclamation-circle mr-2 text-red-600';
+            }
+            toast.classList.remove('hidden', 'translate-y-4', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3500);
+        }
+
+        // =====================================================================
+        // MOBILE MENU
+        // =====================================================================
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.querySelector('aside');
+        const overlay = document.getElementById('mobile-overlay');
+        if (mobileBtn && sidebar && overlay) {
+            mobileBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('absolute');
+                sidebar.classList.toggle('h-full');
+                overlay.classList.toggle('hidden');
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('absolute', 'h-full');
+                overlay.classList.add('hidden');
+            });
+        }
+    </script>
+</body>
+
+</html>
