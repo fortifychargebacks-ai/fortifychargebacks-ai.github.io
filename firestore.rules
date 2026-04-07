@@ -1,0 +1,118 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin(appId) {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/artifacts/$(appId)/public/data/admins/$(request.auth.uid)).data.role == "admin";
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /artifacts/{appId}/public/data/clients/{userId} {
+      allow create: if isOwner(userId);
+      allow read, update: if isOwner(userId) || isAdmin(appId);
+      allow delete: if isAdmin(appId);
+    }
+
+    match /artifacts/{appId}/public/data/cases/{caseId} {
+      allow read: if isSignedIn() &&
+        (resource.data.clientId == request.auth.uid || isAdmin(appId));
+
+      allow create: if
+        isSignedIn() &&
+        request.resource.data.clientId == request.auth.uid &&
+        request.resource.data.keys().hasAll([
+          "clientId",
+          "transactionId",
+          "title",
+          "amount",
+          "network",
+          "reasonCode",
+          "description",
+          "createdAt",
+          "status"
+        ]) &&
+        request.resource.data.keys().hasOnly([
+          "clientId",
+          "caseId",
+          "caseNumber",
+          "transactionId",
+          "title",
+          "amount",
+          "network",
+          "reasonCode",
+          "description",
+          "createdAt",
+          "status",
+          "clientName",
+          "businessName",
+          "processor",
+          "currency",
+          "transactionDate",
+          "disputeDate",
+          "orderId",
+          "trackingNumber",
+          "evidenceFiles",
+          "clientEmail"
+        ]) &&
+        request.resource.data.transactionId is string &&
+        request.resource.data.title is string &&
+        request.resource.data.network is string &&
+        request.resource.data.reasonCode is string &&
+        request.resource.data.description is string &&
+        request.resource.data.amount is number &&
+        request.resource.data.amount >= 0 &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.status == "Open";
+
+      allow update: if isAdmin(appId) ||
+        (
+          isSignedIn() &&
+          resource.data.clientId == request.auth.uid &&
+          request.resource.data.diff(resource.data)
+            .changedKeys()
+            .hasOnly(["clientReply", "status", "lastUpdatedBy", "updatedAt", "evidenceFiles"])
+        );
+
+      allow delete: if isAdmin(appId);
+    }
+
+    match /artifacts/{appId}/public/data/admins/{adminId} {
+      allow read: if isSignedIn() && request.auth.uid == adminId;
+      allow write: if false;
+    }
+
+    match /artifacts/{appId}/public/data/inquiries/{id} {
+      allow create: if
+        request.resource.data.keys().hasOnly([
+          "name",
+          "email",
+          "phone",
+          "volume",
+          "message",
+          "timestamp",
+          "userId"
+        ]) &&
+        request.resource.data.timestamp is timestamp;
+
+      allow read, delete: if isAdmin(appId);
+      allow update: if isAdmin(appId);
+    }
+
+    match /artifacts/{appId}/public/data/admin_notes/{noteId} {
+      allow read, write: if isAdmin(appId);
+    }
+
+    match /artifacts/{appId}/public/data/settings/{settingId} {
+      allow read, write: if isSignedIn();
+    }
+
+  }
+}

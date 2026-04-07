@@ -1,0 +1,18 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Case evidence files — authenticated users can upload (max 2MB), admins can manage
+    match /cases/{caseId}/evidence/{fileName} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.size < 2 * 1024 * 1024;
+      allow delete: if request.auth != null;
+    }
+
+    // Default: deny everything else
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
